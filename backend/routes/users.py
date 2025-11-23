@@ -7,6 +7,7 @@ from flask import Blueprint, request, jsonify
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from models.useraccount import UserAccount
 from utils.email import send_otp_email
+from config import db
 
 users_bp = Blueprint("users", __name__)
 otp_storage = {}  # In-memory OTP store
