@@ -179,16 +179,15 @@
                 const response = await api.login(email, password);
 
                 if (response && response.user) {
-                    // Store user info in localStorage
-                    localStorage.setItem('user', JSON.stringify(response.user));
-                    localStorage.setItem('userId', response.user.UserID);
+                    // Save auth state using API client method
+                    api.saveAuth(response.user, response.user.UserID);
 
                     successEl.textContent = 'Login successful! Redirecting...';
                     successEl.style.display = 'block';
 
                     // Redirect to restaurants page
                     setTimeout(() => {
-                        window.location.href = '/restaurants.html';
+                        window.location.href = '/restaurants';
                     }, 1000);
                 } else {
                     errorEl.textContent = 'Invalid credentials';

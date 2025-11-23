@@ -1,30 +1,76 @@
 #!/usr/bin/env python3
 """
 Proxy HTTP server to serve static files and forward API requests to backend.
-Configured for Replit environment on port 5000.
+Configured for Replit environment on port 5000 with clean URL routing.
 """
 import http.server
 import socketserver
 import urllib.request
 import urllib.error
 import json
+import os
 
 PORT = 5000
 HOST = "0.0.0.0"
 FRONTEND_DIR = "frontend"
 BACKEND_URL = "http://127.0.0.1:8000"
 
+URL_REWRITES = {
+    '/restaurants': '/restaurants.html',
+    '/login': '/login.html',
+    '/signup': '/signup.html',
+    '/favorites': '/favorites.html',
+    '/promotions': '/promotions.html',
+    '/restaurant-detail': '/restaurant-detail.html',
+    '/verify-otp': '/verify-otp.html',
+    '/dashboard': '/dashboard.html',
+    '/profile': '/profile.html',
+    '/my-reservations': '/my-reservations.html',
+}
+
 class ProxyHandler(http.server.SimpleHTTPRequestHandler):
-    """Custom handler with API proxy and cache control"""
+    """Custom handler with API proxy, clean URL routing, and cache control"""
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=FRONTEND_DIR, **kwargs)
+    
+    def rewrite_path(self, path):
+        """Rewrite clean URLs to actual file paths"""
+        clean_path = path.split('?')[0]
+        
+        if clean_path in URL_REWRITES:
+            query_string = '?' + path.split('?')[1] if '?' in path else ''
+            return URL_REWRITES[clean_path] + query_string
+        
+        return path
     
     def do_GET(self):
         if self.path.startswith('/api/'):
             self.proxy_request()
         else:
+            original_path = self.path
+            self.path = self.rewrite_path(self.path)
+            
+            file_path = os.path.join(FRONTEND_DIR, self.path.split('?')[0].lstrip('/'))
+            
+            if not os.path.exists(file_path) and not self.path.startswith('/'):
+                if os.path.isdir(os.path.join(FRONTEND_DIR, self.path.lstrip('/'))):
+                    index_path = os.path.join(file_path, 'index.html')
+                    if os.path.exists(index_path):
+                        super().do_GET()
+                        return
+                
+                self.send_error(404, f"File not found: {original_path}")
+                return
+            
             super().do_GET()
+    
+    def do_HEAD(self):
+        if self.path.startswith('/api/'):
+            self.proxy_request()
+        else:
+            self.path = self.rewrite_path(self.path)
+            super().do_HEAD()
     
     def do_POST(self):
         if self.path.startswith('/api/'):
@@ -43,16 +89,6 @@ class ProxyHandler(http.server.SimpleHTTPRequestHandler):
             self.proxy_request()
         else:
             self.send_error(405, "Method Not Allowed")
-    
-    def do_OPTIONS(self):
-        if self.path.startswith('/api/'):
-            self.send_response(200)
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-            self.end_headers()
-        else:
-            super().do_OPTIONS()
     
     def proxy_request(self):
         """Forward API requests to backend server"""

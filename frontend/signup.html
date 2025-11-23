@@ -205,12 +205,19 @@
 
                 const response = await api.register(userData);
 
-                if (response && response.user_id) {
-                    successEl.textContent = 'Account created successfully! Redirecting to login...';
+                if (response && response.user) {
+                    // Save auth state (user needs to verify OTP before full access)
+                    api.saveAuth(response.user, response.user.UserID);
+                    
+                    // Store email for OTP verification
+                    localStorage.setItem('pendingVerificationEmail', email);
+                    
+                    successEl.textContent = `Account created! OTP sent to ${email}. Redirecting to verification...`;
                     successEl.style.display = 'block';
 
+                    // Redirect to OTP verification page
                     setTimeout(() => {
-                        window.location.href = '/login.html';
+                        window.location.href = '/verify-otp';
                     }, 2000);
                 } else {
                     errorEl.textContent = 'Registration failed. Please try again.';
