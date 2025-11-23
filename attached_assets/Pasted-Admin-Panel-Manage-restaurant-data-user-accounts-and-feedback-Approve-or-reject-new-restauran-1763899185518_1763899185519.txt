@@ -1,0 +1,42 @@
+Admin Panel
+Manage restaurant data, user accounts, and feedback.
+Approve or reject new restaurant submissions.
+Generate and view analytical reports.
+User Management	
+OTP-based registration and login using email verification.
+Manage user profiles, history, and feedback records.
+Restaurant Information Management
+Add, update, delete, and view restaurant records (name, cuisine, price range, location, contact).
+Menu Management
+Maintain menus for each restaurant including dishes, categories, and prices.
+Recommendation System
+Suggest restaurants based on location, mood, cuisine preference, and previous activity using a hybrid model (Content-Based + Collaborative Filtering).
+Map Visualization
+Display restaurant locations on interactive maps using stored latitude and longitude values.
+Chatbot Assistant
+A rule-based chatbot that helps users find restaurants by handling keyword-based queries.
+Favorites and History Tracking
+Users can bookmark restaurants and view their search history.
+Data used to refine recommendation results.
+Feedback and Reviews
+Users can rate and review restaurants.
+Reviews are stored for analysis and quality improvement.
+Inventory Management
+Track ingredients, stock levels, and supplier details for each restaurant branch.
+Notify admins when items are low in stock.
+Employee Management
+Maintain employee records, assign staff to specific restaurants, and monitor performance.
+Reports and Analytics
+Admin can generate detailed reports about top-rated restaurants, user trends, and sales data.
+Reservation & Table Management
+Customers can book, update, or cancel reservations in real time.
+Admin can monitor upcoming bookings and table availability.
+ Promotion & Discount Management
+Admin can create, update, and manage promotional offers or loyalty programs.
+Discount data is integrated with billing and order modules.
+ Branch & Performance Management
+Manage multiple restaurant branches under one system.
+Compare performance metrics such as sales, customer ratings, and order frequency.
+Security & Access Control
+Role-based access for Admin, Manager, Employee, and Customer.
+Ensures secure login, restricted access, and proper authorization flow.
