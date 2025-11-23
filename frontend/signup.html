@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Smart Restaurant Finder</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/css/shared-styles.css">
     <style>
         body {
             background: linear-gradient(135deg, #5a6f4c 0%, #7a8f6c 100%);
             min-height: 100vh;
-            padding-top: 80px; /* Space for fixed header */
+            padding-top: 80px;
+            /* Space for fixed header */
         }
 
         .page-container {
@@ -25,7 +29,7 @@
             background: white;
             padding: 3rem;
             border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             max-width: 500px;
             width: 100%;
         }
@@ -123,57 +127,57 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Shared header will be inserted here by header.js -->
-    
+
     <div class="page-container">
         <div class="signup-container">
-        <div class="logo">🍽️ Smart Restaurant Finder</div>
-        <h2>Create Account</h2>
+            <div class="logo">🍽️ Smart Restaurant Finder</div>
+            <h2>Create Account</h2>
 
-        <div id="errorMessage" class="error"></div>
-        <div id="successMessage" class="success"></div>
+            <div id="errorMessage" class="error"></div>
+            <div id="successMessage" class="success"></div>
 
-        <form id="signupForm">
-            <div class="form-group">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" name="name" required placeholder="John Doe">
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required placeholder="John Doe">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="your@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="••••••••" minlength="6">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn">Sign Up</button>
+            </form>
+
+            <div class="link">
+                <a href="/login">Already have an account? Login</a>
             </div>
-
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required placeholder="your@email.com">
-            </div>
-
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567">
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="••••••••" minlength="6">
-            </div>
-
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="••••••••">
-            </div>
-
-            <button type="submit" class="btn">Sign Up</button>
-        </form>
-
-        <div class="link">
-            <a href="/login">Already have an account? Login</a>
-        </div>
         </div>
     </div>
 
     <script src="/js/api-client.js"></script>
-    <script src="/js/header.js"></script>
+
     <script>
-        initializeHeader();
-        
+
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -214,10 +218,10 @@
                 if (response && response.user) {
                     // Save auth state (user needs to verify OTP before full access)
                     api.saveAuth(response.user, response.user.UserID);
-                    
+
                     // Store email for OTP verification
                     localStorage.setItem('pendingVerificationEmail', email);
-                    
+
                     successEl.textContent = `Account created! OTP sent to ${email}. Redirecting to verification...`;
                     successEl.style.display = 'block';
 
@@ -237,4 +241,5 @@
         });
     </script>
 </body>
+
 </html>
