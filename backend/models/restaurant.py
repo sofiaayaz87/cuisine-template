@@ -89,6 +89,57 @@ class Restaurant:
             return []
 
     # ----------------------------------------------------
+    # Get a single restaurant by ID
+    # ----------------------------------------------------
+    @staticmethod
+    def get_restaurant_by_id(restaurant_id):
+        try:
+            cursor = db.cursor(buffered=True)
+            sql = """
+                SELECT 
+                    r.RestaurantID,
+                    r.Name,
+                    GROUP_CONCAT(DISTINCT c.CuisineType SEPARATOR ', ') AS Cuisine,
+                    a.Area AS Location,
+                    a.StreetAddress,
+                    a.City,
+                    a.Latitude,
+                    a.Longitude,
+                    ROUND(AVG(rt.RatingScore), 1) AS Rating,
+                    COUNT(rt.RatingScore) AS RatedBy
+                FROM restaurant r
+                LEFT JOIN address a ON r.AddressID = a.AddressID
+                LEFT JOIN restaurantcuisine rc ON r.RestaurantID = rc.RestaurantID
+                LEFT JOIN cuisine c ON rc.CuisineID = c.CuisineID
+                LEFT JOIN rating rt ON r.RestaurantID = rt.RestaurantID
+                WHERE r.RestaurantID = %s
+                GROUP BY r.RestaurantID, r.Name, a.Area, a.StreetAddress, a.City, a.Latitude, a.Longitude
+            """
+            cursor.execute(sql, (restaurant_id,))
+            row = cursor.fetchone()
+            cursor.close()
+
+            if row:
+                rid, name, cuisine, area, street, city, lat, lon, rating, rated_by = row
+                return {
+                    "RestaurantID": rid,
+                    "Name": name,
+                    "Cuisine": cuisine or "N/A",
+                    "Location": area or "N/A",
+                    "StreetAddress": street or "N/A",
+                    "City": city or "N/A",
+                    "Latitude": float(lat) if lat else None,
+                    "Longitude": float(lon) if lon else None,
+                    "Rating": float(rating) if rating is not None else None,
+                    "RatedBy": rated_by if rated_by is not None else 0
+                }
+            return None
+
+        except Exception as e:
+            print("Error fetching restaurant by ID:", e)
+            return None
+
+    # ----------------------------------------------------
     # Get restaurants with distance from user
     # ----------------------------------------------------
     @staticmethod
