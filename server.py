@@ -154,8 +154,9 @@ class ProxyHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
 if __name__ == "__main__":
+    # Enable address reuse before creating the server
+    socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer((HOST, PORT), ProxyHandler) as httpd:
-        httpd.allow_reuse_address = True
         print(f"Frontend server running at http://{HOST}:{PORT}/")
         print(f"Serving static files from {FRONTEND_DIR}/ directory")
         print(f"Proxying /api/* requests to {BACKEND_URL}")
