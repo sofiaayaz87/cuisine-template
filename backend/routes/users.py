@@ -104,7 +104,13 @@ def verify_otp():
         otp_storage.pop(email, None)
         return jsonify({"error": "otp expired"}), 400
 
-    if int(otp_input) != record["otp"]:
+    # Convert OTP input to int for comparison
+    try:
+        otp_int = int(otp_input)
+    except (ValueError, TypeError):
+        return jsonify({"error": "invalid otp format"}), 400
+
+    if otp_int != record["otp"]:
         return jsonify({"error": "invalid otp"}), 400
 
     # MARK EMAIL VERIFIED IN DB
