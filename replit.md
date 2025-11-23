@@ -155,31 +155,57 @@ The "Start Web Server" workflow executes `bash start.sh` which:
 
 ## Recent Changes
 
-### 2025-11-23: Full-Stack Integration
+### 2025-11-23: Full-Stack Integration Completed ✅
 - Cloned Flask backend from GitHub
 - Configured secure environment variables for database
 - Installed Flask, CORS, and MySQL dependencies
 - Updated backend port to 8000 (avoid conflict with frontend)
-- Created JavaScript API client for frontend-backend communication
+- Created JavaScript API client with `/api` proxy routing
+- Built proxy server in `server.py` to forward `/api/*` requests to backend
 - Built functional pages: restaurants, login, signup, favorites, promotions
 - Configured dual-server workflow (frontend + backend)
 - Updated Framer template structure to coexist with functional pages
+- **Added missing backend endpoints:**
+  - `GET /restaurants/search` - Search restaurants by query
+  - `GET /restaurants/<id>` - Get restaurant details
+  - `GET /promotions/active` - Get all active promotions
+  - `GET /recommend/<user_id>` - Get personalized recommendations
+  - `GET /users/<id>` - Get user profile
+- **Fixed all API endpoint mismatches** between frontend and backend
+- **Verified proxy integration** - All API calls successfully route through `/api` proxy
+
+## Integration Architecture
+
+### Proxy Server Design
+The frontend uses a proxy server approach to handle API communication in the Replit environment:
+1. **Frontend** (port 5000): Serves static files and acts as proxy
+2. **Backend** (port 8000): Flask API server (internal only)
+3. **API Client**: All requests use `/api` prefix (e.g., `/api/restaurants/search`)
+4. **Proxy**: `server.py` forwards `/api/*` requests to `http://127.0.0.1:8000`
+
+This architecture ensures:
+- ✅ Browser-compatible API calls (no CORS issues)
+- ✅ Works in Replit iframe environment
+- ✅ Clean separation of concerns
+- ✅ Production-ready structure
 
 ## Known Issues & Next Steps
 
-### Current Limitations
-- Database connection pending (waiting for Railway/AWS RDS setup)
-- API calls work but return empty data without database
-- Some Framer template pages need API integration
+### Current Status
+- ✅ Full-stack integration complete and verified
+- ✅ All API endpoints properly aligned
+- ✅ Proxy server working correctly
+- ⏳ Database connection pending (waiting for Railway/AWS RDS setup)
+- ⏳ API calls return empty data until database is configured
 
 ### To-Do
-1. Configure Railway or AWS RDS MySQL database
+1. **Configure Railway or AWS RDS MySQL database** (Primary blocker)
 2. Test all API endpoints with live data
 3. Integrate booking page with reservations API
 4. Add restaurant detail pages
 5. Implement photo gallery functionality
-6. Set up user authentication flow
-7. Configure deployment settings
+6. Enhance personalized recommendations with user history
+7. Configure deployment settings for production
 
 ## Notes
 - Backend uses CORS to allow frontend API calls
