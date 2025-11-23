@@ -5,11 +5,22 @@
 
 class RestaurantAPI {
     constructor() {
-        // In Replit, the backend runs on localhost:8000 but frontend needs to use the public URL
-        // We'll use relative path /api and handle routing, or use window.location.origin for same domain
-        this.baseURL = window.location.origin.replace(':5000', ':8000');
-        // For Replit environment, we need to use the backend port
-        this.apiBase = 'http://127.0.0.1:8000';
+        // Determine the API base URL
+        // In development/Replit, both frontend and backend run on same machine
+        // Frontend on port 5000, backend on port 8000
+        // But browser needs to call backend via proxy
+        
+        if (typeof window !== 'undefined') {
+            // Browser environment - use current origin with port 8000
+            const currentOrigin = window.location.origin;
+            // Replace port 5000 with 8000 for API calls
+            this.apiBase = currentOrigin.replace(/:\d+$/, ':8000');
+        } else {
+            // Node environment fallback
+            this.apiBase = 'http://127.0.0.1:8000';
+        }
+        
+        console.log('API Base URL:', this.apiBase);
     }
 
     /**

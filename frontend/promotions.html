@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promotions & Deals - Smart Restaurant Finder</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #f8f6f3;
+            color: #333;
+        }
+
+        .header {
+            background-color: #5a6f4c;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 500;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #d4792e 0%, #b86524 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .promotions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .promo-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            border: 3px solid #d4792e;
+        }
+
+        .promo-header {
+            background: linear-gradient(135deg, #d4792e 0%, #b86524 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .promo-discount {
+            font-size: 3rem;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .promo-body {
+            padding: 1.5rem;
+        }
+
+        .promo-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .promo-description {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .promo-restaurant {
+            color: #5a6f4c;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .promo-validity {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .promo-code {
+            background-color: #f0f0f0;
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            color: #d4792e;
+            margin-top: 1rem;
+            border: 2px dashed #d4792e;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-state h2 {
+            font-family: 'Playfair Display', serif;
+            color: #999;
+        }
+
+        .error {
+            background-color: #fee;
+            border: 1px solid #fcc;
+            padding: 1rem;
+            border-radius: 8px;
+            color: #c33;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Smart Restaurant Finder</div>
+        <nav class="nav">
+            <a href="/">Home</a>
+            <a href="/restaurants.html">Restaurants</a>
+            <a href="/favorites.html">Favorites</a>
+            <a href="/promotions.html">Promotions</a>
+            <a href="/login.html">Login</a>
+        </nav>
+    </div>
+
+    <div class="hero">
+        <h1>🎉 Special Offers & Promotions</h1>
+        <p>Save money on your next dining experience</p>
+    </div>
+
+    <div class="main-content">
+        <div id="errorContainer"></div>
+        <div id="loadingContainer" class="loading" style="display: none;">
+            Loading promotions...
+        </div>
+        <div id="promotionsGrid" class="promotions-grid"></div>
+    </div>
+
+    <script src="/js/api-client.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPromotions();
+        });
+
+        async function loadPromotions() {
+            const loadingEl = document.getElementById('loadingContainer');
+            const gridEl = document.getElementById('promotionsGrid');
+            const errorEl = document.getElementById('errorContainer');
+
+            try {
+                loadingEl.style.display = 'block';
+                gridEl.innerHTML = '';
+                errorEl.innerHTML = '';
+
+                const promotions = await api.getActivePromotions();
+
+                loadingEl.style.display = 'none';
+
+                if (!promotions || promotions.length === 0) {
+                    gridEl.innerHTML = `
+                        <div class="empty-state">
+                            <h2>No active promotions at the moment</h2>
+                            <p>Check back later for amazing deals!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                renderPromotions(promotions);
+            } catch (error) {
+                loadingEl.style.display = 'none';
+                errorEl.innerHTML = `<div class="error">Error loading promotions: ${error.message}</div>`;
+                console.error('Error:', error);
+            }
+        }
+
+        function renderPromotions(promotions) {
+            const gridEl = document.getElementById('promotionsGrid');
+            gridEl.innerHTML = promotions.map(promo => `
+                <div class="promo-card">
+                    <div class="promo-header">
+                        <div class="promo-discount">${promo.discount_percentage}% OFF</div>
+                    </div>
+                    <div class="promo-body">
+                        <h3 class="promo-title">${promo.title || 'Special Offer'}</h3>
+                        <p class="promo-description">${promo.description || ''}</p>
+                        <div class="promo-restaurant">📍 ${promo.restaurant_name || 'Various Restaurants'}</div>
+                        <div class="promo-validity">
+                            Valid: ${formatDate(promo.start_date)} - ${formatDate(promo.end_date)}
+                        </div>
+                        ${promo.promo_code ? `<div class="promo-code">Code: ${promo.promo_code}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+    </script>
+</body>
+</html>

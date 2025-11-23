@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Favorites - Smart Restaurant Finder</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #f8f6f3;
+            color: #333;
+        }
+
+        .header {
+            background-color: #5a6f4c;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 500;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #5a6f4c 0%, #7a8f6c 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .favorite-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .favorite-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .favorite-image {
+            width: 100%;
+            height: 200px;
+            background-color: #e0e0e0;
+        }
+
+        .favorite-info {
+            padding: 1.5rem;
+        }
+
+        .favorite-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .favorite-details {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .remove-btn {
+            background-color: #c33;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .remove-btn:hover {
+            background-color: #a22;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-state h2 {
+            font-family: 'Playfair Display', serif;
+            color: #999;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state a {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 1rem 2rem;
+            background-color: #d4792e;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .error {
+            background-color: #fee;
+            border: 1px solid #fcc;
+            padding: 1rem;
+            border-radius: 8px;
+            color: #c33;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Smart Restaurant Finder</div>
+        <nav class="nav">
+            <a href="/">Home</a>
+            <a href="/restaurants.html">Restaurants</a>
+            <a href="/favorites.html">Favorites</a>
+            <a href="/promotions.html">Promotions</a>
+            <a href="/login.html" id="authLink">Login</a>
+        </nav>
+    </div>
+
+    <div class="hero">
+        <h1>❤️ My Favorite Restaurants</h1>
+        <p>Your saved restaurants in one place</p>
+    </div>
+
+    <div class="main-content">
+        <div id="errorContainer"></div>
+        <div id="loadingContainer" class="loading" style="display: none;">
+            Loading your favorites...
+        </div>
+        <div id="favoritesGrid" class="favorites-grid"></div>
+    </div>
+
+    <script src="/js/api-client.js"></script>
+    <script>
+        // Check if user is logged in
+        const user = JSON.parse(localStorage.getItem('user') || 'null');
+        const userId = localStorage.getItem('userId');
+
+        if (user) {
+            document.getElementById('authLink').textContent = user.name || 'Profile';
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!userId) {
+                document.getElementById('favoritesGrid').innerHTML = `
+                    <div class="empty-state">
+                        <h2>Please login to view your favorites</h2>
+                        <a href="/login.html">Login Now</a>
+                    </div>
+                `;
+                return;
+            }
+
+            loadFavorites();
+        });
+
+        async function loadFavorites() {
+            const loadingEl = document.getElementById('loadingContainer');
+            const gridEl = document.getElementById('favoritesGrid');
+            const errorEl = document.getElementById('errorContainer');
+
+            try {
+                loadingEl.style.display = 'block';
+                gridEl.innerHTML = '';
+                errorEl.innerHTML = '';
+
+                const favorites = await api.getUserFavorites(userId);
+
+                loadingEl.style.display = 'none';
+
+                if (!favorites || favorites.length === 0) {
+                    gridEl.innerHTML = `
+                        <div class="empty-state">
+                            <h2>No favorites yet</h2>
+                            <p>Start exploring and save your favorite restaurants!</p>
+                            <a href="/restaurants.html">Browse Restaurants</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                renderFavorites(favorites);
+            } catch (error) {
+                loadingEl.style.display = 'none';
+                errorEl.innerHTML = `<div class="error">Error loading favorites: ${error.message}</div>`;
+                console.error('Error:', error);
+            }
+        }
+
+        function renderFavorites(favorites) {
+            const gridEl = document.getElementById('favoritesGrid');
+            gridEl.innerHTML = favorites.map(fav => `
+                <div class="favorite-card">
+                    <div class="favorite-image" style="background: linear-gradient(135deg, #${Math.floor(Math.random()*16777215).toString(16)} 0%, #${Math.floor(Math.random()*16777215).toString(16)} 100%);"></div>
+                    <div class="favorite-info">
+                        <h3 class="favorite-name">${fav.restaurant_name || 'Unknown'}</h3>
+                        <p class="favorite-details">${fav.cuisine || ''}</p>
+                        <p class="favorite-details">${fav.location || ''}</p>
+                        <button class="remove-btn" onclick="removeFavorite(${fav.FavoriteID})">Remove from Favorites</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function removeFavorite(favoriteId) {
+            if (!confirm('Remove this restaurant from favorites?')) {
+                return;
+            }
+
+            try {
+                await api.removeFavorite(favoriteId);
+                loadFavorites(); // Reload the list
+            } catch (error) {
+                alert(`Error removing favorite: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
