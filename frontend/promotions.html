@@ -8,10 +8,6 @@
     <link rel="stylesheet" href="/css/shared-styles.css">
     <style>
         /* Page-specific styles - shared header styles come from shared-styles.css */
-        body {
-            padding-top: 70px; /* Space for fixed shared header */
-        }
-
         .hero {
             background: linear-gradient(135deg, #d4792e 0%, #b86524 100%);
             color: white;
@@ -105,11 +101,18 @@
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
+            grid-column: 1 / -1; /* Span all columns in grid */
         }
 
         .empty-state h2 {
             font-family: 'Playfair Display', serif;
             color: #999;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state p {
+            color: #999;
+            font-size: 1.1rem;
         }
 
         .error {
