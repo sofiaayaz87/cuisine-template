@@ -202,7 +202,7 @@
                     errorEl.style.display = 'block';
                 }
             } catch (error) {
-                errorEl.textContent = `Login failed: ${error.message}. Please configure your database.`;
+                errorEl.textContent = `Login failed: ${error.message}`;
                 errorEl.style.display = 'block';
                 console.error('Login error:', error);
             }

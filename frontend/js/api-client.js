@@ -8,18 +8,18 @@ class RestaurantAPI {
         // Use proxy approach for all browser environments
         // The frontend server (server.py) proxies /api/* to backend at localhost:8000
         // This works in both Replit and local development
-        
+
         if (typeof window !== 'undefined') {
             this.apiBase = '/api';
         } else {
             // Node environment fallback
             this.apiBase = 'http://127.0.0.1:8000';
         }
-        
+
         this.user = null;
         this.userId = null;
         this.loadAuth();
-        
+
         console.log('API Base URL:', this.apiBase);
     }
 
@@ -75,7 +75,8 @@ class RestaurantAPI {
                 },
             });
 
-            if (!response.ok) {
+            if (!response.ok && !response.status == 401) {
+                console.log('Response: ', response);
                 throw new Error(`API Error: ${response.statusText}`);
             }
 
@@ -87,7 +88,7 @@ class RestaurantAPI {
     }
 
     // ==================== RESTAURANTS ====================
-    
+
     /**
      * Get recommended restaurants
      * @param {number} userLat - User latitude (optional)
@@ -118,7 +119,7 @@ class RestaurantAPI {
     }
 
     // ==================== MENU ====================
-    
+
     /**
      * Get menu items for a restaurant
      * @param {number} restaurantId
@@ -128,7 +129,7 @@ class RestaurantAPI {
     }
 
     // ==================== USERS ====================
-    
+
     /**
      * User login
      * @param {string} email
@@ -192,7 +193,7 @@ class RestaurantAPI {
     }
 
     // ==================== RESERVATIONS ====================
-    
+
     /**
      * Create a reservation
      * @param {object} reservationData
@@ -247,7 +248,7 @@ class RestaurantAPI {
     }
 
     // ==================== FAVORITES ====================
-    
+
     /**
      * Get user favorites
      * @param {number} userId
@@ -281,7 +282,7 @@ class RestaurantAPI {
     }
 
     // ==================== PROMOTIONS ====================
-    
+
     /**
      * Get active promotions
      */
@@ -298,7 +299,7 @@ class RestaurantAPI {
     }
 
     // ==================== PHOTOS ====================
-    
+
     /**
      * Get photos for a restaurant
      * @param {number} restaurantId
@@ -308,7 +309,7 @@ class RestaurantAPI {
     }
 
     // ==================== RECOMMENDATIONS ====================
-    
+
     /**
      * Get personalized recommendations
      * @param {number} userId
@@ -345,7 +346,7 @@ class RestaurantAPI {
     }
 
     // ==================== MENU ITEMS ====================
-    
+
     /**
      * Get menu item details
      * @param {number} itemId
@@ -355,7 +356,7 @@ class RestaurantAPI {
     }
 
     // ==================== RATINGS & REVIEWS ====================
-    
+
     /**
      * Submit a rating and review for a restaurant
      * @param {number} userId

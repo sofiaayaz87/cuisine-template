@@ -234,7 +234,7 @@
                     errorEl.style.display = 'block';
                 }
             } catch (error) {
-                errorEl.textContent = `Registration failed: ${error.message}. Please configure your database.`;
+                errorEl.textContent = `Registration failed: ${error.message}`;
                 errorEl.style.display = 'block';
                 console.error('Registration error:', error);
             }
