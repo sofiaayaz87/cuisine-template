@@ -355,10 +355,11 @@ class RestaurantAPI {
     }
 }
 
-// Create a singleton instance
+// Create a singleton instance and expose it globally
 const api = new RestaurantAPI();
+window.api = api; // Expose to window for use in inline scripts
 
-// Export for use in other scripts
+// Export for use in other scripts (Node.js/module systems)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = api;
 }

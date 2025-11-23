@@ -5,45 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Restaurants - Smart Restaurant Finder</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/shared-styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: #f8f6f3;
-            color: #333;
-        }
-
-        .header {
-            background-color: #5a6f4c;
-            color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            font-weight: 500;
-        }
-
-        .nav {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
+        /* Page-specific styles */
         .hero {
             background: linear-gradient(135deg, #5a6f4c 0%, #7a8f6c 100%);
             color: white;
@@ -52,9 +16,13 @@
         }
 
         .hero h1 {
-            font-family: 'Playfair Display', serif;
             font-size: 3rem;
             margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
         }
 
         .search-container {
@@ -177,17 +145,8 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">Smart Restaurant Finder</div>
-        <nav class="nav">
-            <a href="/">Home</a>
-            <a href="/restaurants.html">Restaurants</a>
-            <a href="/menu/">Menu</a>
-            <a href="/book/">Book Table</a>
-            <a href="/login.html">Login</a>
-        </nav>
-    </div>
-
+    <!-- Shared header will be inserted here by header.js -->
+    
     <div class="hero">
         <h1>Discover Your Next Favorite Restaurant</h1>
         <p>Find the perfect dining experience near you</p>
@@ -207,11 +166,13 @@
     </div>
 
     <script src="/js/api-client.js"></script>
+    <script src="/js/header.js"></script>
     <script>
         let currentLocation = null;
 
         // Load restaurants on page load
         window.addEventListener('DOMContentLoaded', () => {
+            initializeHeader();
             loadRestaurants();
         });
 

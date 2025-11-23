@@ -5,21 +5,16 @@
 
 class AppHeader {
     constructor() {
-        this.user = null;
-        this.loadUserState();
+        // Use api-client.js as the single source of truth for auth state
+        this.api = window.api || null;
     }
 
-    loadUserState() {
-        try {
-            const userStr = localStorage.getItem('user');
-            const userId = localStorage.getItem('userId');
-            if (userStr && userId) {
-                this.user = JSON.parse(userStr);
-                this.user.id = userId;
-            }
-        } catch (e) {
-            console.error('Failed to load user state:', e);
-        }
+    get user() {
+        return this.api ? this.api.getCurrentUser() : null;
+    }
+
+    get userId() {
+        return this.api ? this.api.getCurrentUserId() : null;
     }
 
     getNavLinks() {
@@ -83,8 +78,9 @@ class AppHeader {
     }
 
     logout() {
-        localStorage.removeItem('user');
-        localStorage.removeItem('userId');
+        if (this.api) {
+            this.api.clearAuth();
+        }
         window.location.href = '/login';
     }
 

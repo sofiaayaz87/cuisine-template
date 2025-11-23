@@ -5,20 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Smart Restaurant Finder</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/shared-styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'DM Sans', sans-serif;
             background: linear-gradient(135deg, #5a6f4c 0%, #7a8f6c 100%);
             min-height: 100vh;
+            padding-top: 80px; /* Space for fixed header */
+        }
+
+        .page-container {
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: calc(100vh - 80px);
         }
 
         .login-container {
@@ -130,7 +129,10 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
+    <!-- Shared header will be inserted here by header.js -->
+    
+    <div class="page-container">
+        <div class="login-container">
         <div class="logo">🍽️ Smart Restaurant Finder</div>
         <h2>Welcome Back</h2>
 
@@ -158,12 +160,16 @@
         </div>
 
         <div class="link">
-            <a href="/restaurants.html">Continue as guest</a>
+            <a href="/restaurants">Continue as guest</a>
+        </div>
         </div>
     </div>
 
     <script src="/js/api-client.js"></script>
+    <script src="/js/header.js"></script>
     <script>
+        initializeHeader();
+        
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 

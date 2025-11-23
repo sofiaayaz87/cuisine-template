@@ -5,43 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Promotions & Deals - Smart Restaurant Finder</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/shared-styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Page-specific styles - shared header styles come from shared-styles.css */
         body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: #f8f6f3;
-            color: #333;
-        }
-
-        .header {
-            background-color: #5a6f4c;
-            color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            font-weight: 500;
-        }
-
-        .nav {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
+            padding-top: 70px; /* Space for fixed shared header */
         }
 
         .hero {
@@ -155,17 +123,8 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">Smart Restaurant Finder</div>
-        <nav class="nav">
-            <a href="/">Home</a>
-            <a href="/restaurants.html">Restaurants</a>
-            <a href="/favorites.html">Favorites</a>
-            <a href="/promotions.html">Promotions</a>
-            <a href="/login.html">Login</a>
-        </nav>
-    </div>
-
+    <!-- Shared header will be inserted here by header.js -->
+    
     <div class="hero">
         <h1>🎉 Special Offers & Promotions</h1>
         <p>Save money on your next dining experience</p>
@@ -180,8 +139,10 @@
     </div>
 
     <script src="/js/api-client.js"></script>
+    <script src="/js/header.js"></script>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
+            initializeHeader();
             loadPromotions();
         });
 
