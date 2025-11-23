@@ -93,15 +93,21 @@ def verify_otp():
     data = request.get_json(force=True)
     email = (data.get("email") or "").strip().lower()
     otp_input = data.get("otp")
-    print(data)
+    print(f"[OTP VERIFY] Request data: {data}")
+    
     if not email or not otp_input:
+        print(f"[OTP VERIFY] Missing email or OTP")
         return jsonify({"error": "email and otp required"}), 400
 
     record = otp_storage.get(email)
     if not record:
+        print(f"[OTP VERIFY] No OTP found for {email}. Current storage: {list(otp_storage.keys())}")
         return jsonify({"error": "no OTP requested for this email"}), 400
 
+    print(f"[OTP VERIFY] Found record for {email}: OTP={record['otp']}, Expires={record['expires']}")
+    
     if datetime.utcnow() > record["expires"]:
+        print(f"[OTP VERIFY] OTP expired for {email}")
         otp_storage.pop(email, None)
         return jsonify({"error": "otp expired"}), 400
 
@@ -109,9 +115,13 @@ def verify_otp():
     try:
         otp_int = int(otp_input)
     except (ValueError, TypeError):
+        print(f"[OTP VERIFY] Invalid OTP format: {otp_input}")
         return jsonify({"error": "invalid otp format"}), 400
 
+    print(f"[OTP VERIFY] Comparing OTP: input={otp_int}, stored={record['otp']}")
+    
     if otp_int != record["otp"]:
+        print(f"[OTP VERIFY] OTP mismatch for {email}")
         return jsonify({"error": "invalid otp"}), 400
 
     # MARK EMAIL VERIFIED IN DB
