@@ -6,8 +6,17 @@ from config import db
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 class UserAccount:
-    def __init__(self, Id=None, FirstName=None, LastName=None, Email=None, ContactNo=None, Password=None, Role="user"):
+
+    def __init__(self,
+                 Id=None,
+                 FirstName=None,
+                 LastName=None,
+                 Email=None,
+                 ContactNo=None,
+                 Password=None,
+                 Role="user"):
         self.Id = Id
         self.FirstName = FirstName
         self.LastName = LastName
@@ -18,13 +27,14 @@ class UserAccount:
 
     @staticmethod
     def hash_password(password):
-        return hashlib.sha256(password.encode()).hexdigest() if password else None
+        return hashlib.sha256(
+            password.encode()).hexdigest() if password else None
 
     @staticmethod
     def get_by_email(email):
         cursor = db.cursor(buffered=True)
         sql = "SELECT * FROM useraccount WHERE Email=%s"
-        cursor.execute(sql, (email,))
+        cursor.execute(sql, (email, ))
         row = cursor.fetchone()
         cursor.close()
         return row
@@ -32,6 +42,7 @@ class UserAccount:
     @staticmethod
     def verify_login(email, password):
         hashed = UserAccount.hash_password(password)
+        print("Hashed password:", hashed)
         cursor = db.cursor(buffered=True)
         sql = "SELECT * FROM useraccount WHERE Email=%s AND PasswordHash=%s"
         cursor.execute(sql, (email, hashed))
@@ -49,16 +60,8 @@ class UserAccount:
             (FirstName, LastName, Email, ContactNo, PasswordHash, Role, IsEmailVerified, CreatedAt)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
-        val = (
-            self.FirstName,
-            self.LastName,
-            self.Email,
-            self.ContactNo,
-            self.PasswordHash,
-            self.Role,
-            0,
-            datetime.now()
-        )
+        val = (self.FirstName, self.LastName, self.Email, self.ContactNo,
+               self.PasswordHash, self.Role, 0, datetime.now())
         try:
             cursor.execute(sql, val)
             db.commit()
@@ -74,8 +77,9 @@ class UserAccount:
         if not row:
             return None
         keys = [
-            "Id", "FirstName", "LastName", "Email", "ContactNo", "PasswordHash",
-            "Role", "IsEmailVerified", "CreatedAt", "UpdatedAt", "ProfileImageURL", "Status"
+            "Id", "FirstName", "LastName", "Email", "ContactNo",
+            "PasswordHash", "Role", "IsEmailVerified", "CreatedAt",
+            "UpdatedAt", "ProfileImageURL", "Status"
         ]
         return dict(zip(keys, row))
 
@@ -83,7 +87,7 @@ class UserAccount:
     def get_user_by_id(user_id):
         cursor = db.cursor(buffered=True)
         sql = "SELECT * FROM useraccount WHERE Id=%s"
-        cursor.execute(sql, (user_id,))
+        cursor.execute(sql, (user_id, ))
         row = cursor.fetchone()
         cursor.close()
         return UserAccount.row_to_dict(row)
@@ -133,7 +137,7 @@ class UserAccount:
             INNER JOIN favorite f ON r.RestaurantID = f.RestaurantID
             WHERE f.UserID=%s
         """
-        cursor.execute(sql, (user_id,))
+        cursor.execute(sql, (user_id, ))
         rows = cursor.fetchall()
         cursor.close()
         return rows
