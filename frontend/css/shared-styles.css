@@ -375,3 +375,43 @@ h3 {
         font-size: 1.75rem;
     }
 }
+
+/* ============================================
+   STAR RATING COMPONENT
+   ============================================ */
+
+.star-rating {
+    display: inline-flex;
+    gap: 2px;
+    align-items: center;
+}
+
+.star {
+    color: #ddd;
+    transition: color var(--transition-fast), transform var(--transition-fast);
+    cursor: default;
+    line-height: 1;
+}
+
+.star-filled {
+    color: #ffa500;
+}
+
+.star-half {
+    background: linear-gradient(90deg, #ffa500 50%, #ddd 50%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.star-interactive {
+    cursor: pointer;
+}
+
+.star-interactive:hover {
+    transform: scale(1.1);
+}
+
+.star-empty {
+    color: #ddd;
+}

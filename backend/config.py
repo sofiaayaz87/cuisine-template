@@ -2,7 +2,7 @@ import mysql.connector
 import os
 
 DB_HOST = os.environ.get("MYSQL_HOST", "localhost")
-DB_PORT = int(os.environ.get("MYSQL_PORT", 3306))
+DB_PORT = int(os.environ.get("MYSQL_PORT") or 3306)
 DB_USER = os.environ.get("MYSQL_USER", "root")
 DB_PASS = os.environ.get("MYSQL_PASSWORD", "")
 DB_NAME = os.environ.get("MYSQL_DATABASE", "smart_restaurant_finder")

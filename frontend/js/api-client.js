@@ -353,6 +353,44 @@ class RestaurantAPI {
     async getMenuItem(itemId) {
         return await this.request(`/menu/item/${itemId}`);
     }
+
+    // ==================== RATINGS & REVIEWS ====================
+    
+    /**
+     * Submit a rating and review for a restaurant
+     * @param {number} userId
+     * @param {number} restaurantId
+     * @param {number} ratingScore - Rating from 1-5
+     * @param {string} reviewText - Optional review text
+     */
+    async submitReview(userId, restaurantId, ratingScore, reviewText = '') {
+        return await this.request('/ratings/add', {
+            method: 'POST',
+            body: JSON.stringify({
+                UserID: userId,
+                RestaurantID: restaurantId,
+                RatingScore: ratingScore,
+                Review: reviewText
+            }),
+        });
+    }
+
+    /**
+     * Get all reviews for a restaurant
+     * @param {number} restaurantId
+     */
+    async getRestaurantReviews(restaurantId) {
+        return await this.request(`/ratings/restaurant/${restaurantId}`);
+    }
+
+    /**
+     * Get a user's rating for a specific restaurant
+     * @param {number} userId
+     * @param {number} restaurantId
+     */
+    async getUserRating(userId, restaurantId) {
+        return await this.request(`/ratings/user/${userId}/restaurant/${restaurantId}`);
+    }
 }
 
 // Create a singleton instance and expose it globally

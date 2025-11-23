@@ -167,6 +167,7 @@
 
     <script src="/js/api-client.js"></script>
     <script src="/js/header.js"></script>
+    <script src="/js/star-rating.js"></script>
     <script>
         let currentLocation = null;
 
@@ -205,18 +206,28 @@
 
         function renderRestaurants(restaurants) {
             const gridEl = document.getElementById('restaurantGrid');
-            gridEl.innerHTML = restaurants.map(restaurant => `
-                <div class="restaurant-card" onclick="viewRestaurant(${restaurant.RestaurantID})">
-                    <div class="restaurant-image" style="background: linear-gradient(135deg, #${Math.floor(Math.random()*16777215).toString(16)} 0%, #${Math.floor(Math.random()*16777215).toString(16)} 100%);"></div>
-                    <div class="restaurant-info">
-                        <h3 class="restaurant-name">${escapeHtml(restaurant.Name || 'Unknown Restaurant')}</h3>
-                        <p class="restaurant-details">${escapeHtml(restaurant.Cuisine || 'Cuisine not specified')}</p>
-                        <p class="restaurant-details">${escapeHtml(restaurant.Location || '')}</p>
-                        <div class="rating">⭐ ${restaurant.Rating || 'N/A'} / 5</div>
-                        ${restaurant.Distance_km ? `<div class="distance">📍 ${restaurant.Distance_km.toFixed(1)} km away</div>` : ''}
+            gridEl.innerHTML = restaurants.map(restaurant => {
+                const rating = restaurant.Rating || 0;
+                const reviewCount = restaurant.RatedBy || 0;
+                const starDisplay = StarRating.display(rating, 18);
+                
+                return `
+                    <div class="restaurant-card" onclick="viewRestaurant(${restaurant.RestaurantID})">
+                        <div class="restaurant-image" style="background: linear-gradient(135deg, #${Math.floor(Math.random()*16777215).toString(16)} 0%, #${Math.floor(Math.random()*16777215).toString(16)} 100%);"></div>
+                        <div class="restaurant-info">
+                            <h3 class="restaurant-name">${escapeHtml(restaurant.Name || 'Unknown Restaurant')}</h3>
+                            <p class="restaurant-details">${escapeHtml(restaurant.Cuisine || 'Cuisine not specified')}</p>
+                            <p class="restaurant-details">${escapeHtml(restaurant.Location || '')}</p>
+                            <div class="rating">
+                                ${starDisplay}
+                                <span style="margin-left: 0.5rem; color: #666;">${rating > 0 ? rating.toFixed(1) : 'No rating'}</span>
+                                ${reviewCount > 0 ? `<span style="margin-left: 0.5rem; color: #999; font-size: 0.9rem;">(${reviewCount} reviews)</span>` : ''}
+                            </div>
+                            ${restaurant.Distance_km ? `<div class="distance">📍 ${restaurant.Distance_km.toFixed(1)} km away</div>` : ''}
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         async function searchRestaurants() {
@@ -257,7 +268,7 @@
         }
 
         function viewRestaurant(id) {
-            window.location.href = `/restaurant-detail.html?id=${id}`;
+            window.location.href = `/restaurant-detail?id=${id}`;
         }
 
         function escapeHtml(text) {
