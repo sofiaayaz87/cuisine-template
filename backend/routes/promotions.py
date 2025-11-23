@@ -9,6 +9,15 @@ from models.promotion import Promotion
 
 promotions_bp = Blueprint("promotions", __name__)
 
+# Get all active promotions
+@promotions_bp.route("/active", methods=["GET"])
+def get_active_promotions():
+    """
+    Get all currently active promotions across all restaurants
+    """
+    rows = Promotion.get_all_active()
+    return jsonify(rows), 200
+
 # List promotions per restaurant
 @promotions_bp.route("/restaurant/<int:restaurant_id>", methods=["GET"])
 def list_promotions(restaurant_id):

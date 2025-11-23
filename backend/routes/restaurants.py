@@ -63,3 +63,61 @@ def recommend_restaurants():
         r["MapsURL"] = maps_url
 
     return jsonify(sorted_restaurants)
+
+# -------------------------
+# Search restaurants route
+# -------------------------
+@restaurants_bp.route("/search", methods=["GET"])
+def search_restaurants():
+    """
+    Endpoint: /search?q=pizza
+    - q: search query for restaurant name, cuisine, or location
+    """
+    query = request.args.get("q", "").lower()
+    
+    if not query:
+        # Return all restaurants if no query
+        all_restaurants = Restaurant.get_all_restaurants()
+    else:
+        # Get all and filter
+        all_restaurants = Restaurant.get_all_restaurants()
+        filtered = []
+        for r in all_restaurants:
+            name = (r.get("Name") or "").lower()
+            cuisine = (r.get("Cuisine") or "").lower()
+            location = (r.get("Location") or "").lower()
+            
+            if query in name or query in cuisine or query in location:
+                filtered.append(r)
+        
+        all_restaurants = filtered
+    
+    # Add Google Maps URL
+    for r in all_restaurants:
+        lat = r.get("Latitude")
+        lon = r.get("Longitude")
+        loc = r.get("Location")
+        
+        if lat and lon:
+            maps_url = f"https://www.google.com/maps/search/?api=1&query={lat},{lon}"
+        else:
+            encoded_address = urllib.parse.quote_plus(str(loc))
+            maps_url = f"https://www.google.com/maps/search/?api=1&query={encoded_address}"
+        
+        r["MapsURL"] = maps_url
+    
+    return jsonify(all_restaurants)
+
+# -------------------------
+# Get restaurant by ID route
+# -------------------------
+@restaurants_bp.route("/<int:restaurant_id>", methods=["GET"])
+def get_restaurant(restaurant_id):
+    """
+    Endpoint: /restaurants/<id>
+    """
+    restaurant = Restaurant.get_restaurant_by_id(restaurant_id)
+    if restaurant:
+        return jsonify(restaurant)
+    else:
+        return jsonify({"error": "Restaurant not found"}), 404

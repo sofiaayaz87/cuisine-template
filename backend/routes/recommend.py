@@ -45,3 +45,25 @@ def recommend():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Get personalized recommendations for a user
+@recommend_bp.route("/<int:user_id>", methods=["GET"])
+def get_user_recommendations(user_id):
+    """
+    Get personalized recommendations for a specific user
+    Uses user's favorite cuisines and past preferences
+    """
+    try:
+        # For now, return general recommendations
+        # TODO: Implement actual personalization based on user history
+        results = Recommender.recommend(
+            cuisines=None,
+            min_price=None,
+            min_rating=4.0,  # Recommend highly rated restaurants
+            location=None,
+            sort_by="rating",
+            limit=10,
+        )
+        return jsonify({"user_id": user_id, "recommendations": results}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

@@ -140,7 +140,15 @@ def get_favorites(user_id):
     rows = UserAccount.get_favorites(user_id)
     return jsonify(rows), 200
 
-# ------------------------- PROFILE UPDATE -------------------------
+# ------------------------- USER PROFILE -------------------------
+@users_bp.route("/<int:user_id>", methods=["GET"])
+def get_user_profile(user_id):
+    """Get user profile by ID"""
+    user = UserAccount.get_by_id(user_id)
+    if user:
+        return jsonify(UserAccount.row_to_dict(user)), 200
+    return jsonify({"error": "User not found"}), 404
+
 @users_bp.route("/users/<int:user_id>", methods=["PUT"])
 def update_profile(user_id):
     data = request.get_json(force=True)

@@ -5,16 +5,12 @@
 
 class RestaurantAPI {
     constructor() {
-        // Determine the API base URL
-        // In development/Replit, both frontend and backend run on same machine
-        // Frontend on port 5000, backend on port 8000
-        // But browser needs to call backend via proxy
+        // Use proxy approach for all browser environments
+        // The frontend server (server.py) proxies /api/* to backend at localhost:8000
+        // This works in both Replit and local development
         
         if (typeof window !== 'undefined') {
-            // Browser environment - use current origin with port 8000
-            const currentOrigin = window.location.origin;
-            // Replace port 5000 with 8000 for API calls
-            this.apiBase = currentOrigin.replace(/:\d+$/, ':8000');
+            this.apiBase = '/api';
         } else {
             // Node environment fallback
             this.apiBase = 'http://127.0.0.1:8000';
@@ -128,7 +124,7 @@ class RestaurantAPI {
      * @param {object} reservationData
      */
     async createReservation(reservationData) {
-        return await this.request('/reservations/', {
+        return await this.request('/reservations/create', {
             method: 'POST',
             body: JSON.stringify(reservationData),
         });
@@ -149,7 +145,7 @@ class RestaurantAPI {
      * @param {number} userId
      */
     async getUserFavorites(userId) {
-        return await this.request(`/favorites/${userId}`);
+        return await this.request(`/favorites/user/${userId}`);
     }
 
     /**
@@ -158,7 +154,7 @@ class RestaurantAPI {
      * @param {number} restaurantId
      */
     async addFavorite(userId, restaurantId) {
-        return await this.request('/favorites/', {
+        return await this.request('/favorites/add', {
             method: 'POST',
             body: JSON.stringify({ user_id: userId, restaurant_id: restaurantId }),
         });
@@ -169,8 +165,9 @@ class RestaurantAPI {
      * @param {number} favoriteId
      */
     async removeFavorite(favoriteId) {
-        return await this.request(`/favorites/${favoriteId}`, {
-            method: 'DELETE',
+        return await this.request('/favorites/remove', {
+            method: 'POST',
+            body: JSON.stringify({ favorite_id: favoriteId }),
         });
     }
 
