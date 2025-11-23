@@ -20,6 +20,21 @@ class Promotion:
         self.IsActive = IsActive
         self.CreatedAt = CreatedAt or datetime.now()
 
+    # Get all active promotions
+    @staticmethod
+    def get_all_active():
+        cursor = db.cursor(buffered=True)
+        sql = """SELECT p.PromotionID, p.RestaurantID, p.Title, p.Description, p.Discount,
+                 p.ValidFrom, p.ValidTo, p.IsActive, p.CreatedAt, r.Name as RestaurantName
+                 FROM promotion p
+                 LEFT JOIN restaurant r ON p.RestaurantID = r.RestaurantID
+                 WHERE p.IsActive=1 AND p.ValidFrom <= NOW() AND p.ValidTo >= NOW()"""
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        cursor.close()
+        keys = ["PromotionID","RestaurantID","Title","Description","Discount","ValidFrom","ValidTo","IsActive","CreatedAt","RestaurantName"]
+        return [dict(zip(keys, r)) for r in rows]
+
     # List promotions for restaurant
     @staticmethod
     def get_for_restaurant(restaurant_id):
