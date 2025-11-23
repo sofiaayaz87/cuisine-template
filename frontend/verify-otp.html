@@ -179,10 +179,7 @@
             verifyBtn.textContent = 'Verifying...';
             
             try {
-                const response = await api.post('/users/verify_otp', {
-                    email: email,
-                    otp: otp
-                });
+                const response = await api.verifyOTP(email, otp);
                 
                 if (response && response.message) {
                     successEl.textContent = 'Email verified successfully! Redirecting to login...';
