@@ -1,6 +1,7 @@
 # backend/app.py
 
 from flask import Flask
+from flask_cors import CORS
 from routes.restaurants import restaurants_bp
 from routes.users import users_bp
 from routes.reservations import reservations_bp  
@@ -11,6 +12,7 @@ from routes.photos import photos_bp
 from routes.promotions import promotions_bp
 
 app = Flask(__name__)
+CORS(app)
 
 app.register_blueprint(restaurants_bp, url_prefix="/restaurants")
 app.register_blueprint(users_bp, url_prefix="/users")
@@ -26,4 +28,4 @@ def home():
     return "Smart Restaurant API is running!"
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="127.0.0.1", port=8000, debug=True)
