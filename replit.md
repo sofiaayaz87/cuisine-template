@@ -66,6 +66,7 @@ A full-stack restaurant discovery platform combining a beautiful Framer-based fr
 6. **Promotions**: View active deals and discounts
 7. **Menu Browsing**: View restaurant menus
 8. **Recommendations**: Get personalized restaurant suggestions
+9. **Reviews & Ratings**: Customers can rate and review restaurants (MVP - see SECURITY_NOTES.md)
 
 ## API Endpoints
 
@@ -94,6 +95,11 @@ A full-stack restaurant discovery platform combining a beautiful Framer-based fr
 
 ### Menu
 - `GET /menu/<restaurant_id>` - Get restaurant menu items
+
+### Ratings & Reviews
+- `POST /ratings/add` - Submit or update a rating/review (⚠️ MVP only - see SECURITY_NOTES.md)
+- `GET /ratings/restaurant/<restaurant_id>` - Get all reviews for a restaurant
+- `GET /ratings/user/<user_id>/restaurant/<restaurant_id>` - Get user's rating for a restaurant
 
 ## Environment Configuration
 
@@ -154,6 +160,24 @@ The "Start Web Server" workflow executes `bash start.sh` which:
 6. **Book** (`/book/`) - Booking page template
 
 ## Recent Changes
+
+### 2025-11-23: Reviews & Ratings System Added ⚠️
+- **Customer Reviews Feature (MVP/Development Only)**
+  - Added rating model and database table for customer reviews
+  - Created backend endpoints: POST /ratings/add, GET /ratings/restaurant/<id>
+  - Built interactive star rating component for 1-5 star selection
+  - Created restaurant detail page (restaurant-detail.html) with review submission
+  - Display all reviews with user info, ratings, dates on detail page
+  - Updated restaurant cards to show average ratings and review counts
+  - Restaurant ratings calculate dynamically via SQL aggregation (auto-update)
+  - Added XSS protection via HTML entity escaping for review text
+  - Fixed database configuration bug (MYSQL_PORT empty string handling)
+  
+- **⚠️ CRITICAL SECURITY LIMITATION:**
+  - Reviews feature uses client-supplied UserID without server authentication
+  - Safe for development/testing but NOT production-ready
+  - See SECURITY_NOTES.md for full details and production requirements
+  - JWT/session authentication REQUIRED before any public deployment
 
 ### 2025-11-23: Full-Stack Integration Completed ✅
 - Cloned Flask backend from GitHub
