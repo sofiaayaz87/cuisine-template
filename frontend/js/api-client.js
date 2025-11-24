@@ -265,7 +265,7 @@ class RestaurantAPI {
     async addFavorite(userId, restaurantId) {
         return await this.request('/favorites/add', {
             method: 'POST',
-            body: JSON.stringify({ UserID: userId, RestaurantID: restaurantId }),
+            body: JSON.stringify({ UserID: parseInt(userId), RestaurantID: parseInt(restaurantId) }),
         });
     }
 
@@ -277,7 +277,7 @@ class RestaurantAPI {
     async removeFavorite(userId, restaurantId) {
         return await this.request('/favorites/remove', {
             method: 'POST',
-            body: JSON.stringify({ UserID: userId, RestaurantID: restaurantId }),
+            body: JSON.stringify({ UserID: parseInt(userId), RestaurantID: parseInt(restaurantId) }),
         });
     }
 
