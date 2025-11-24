@@ -75,9 +75,10 @@ class RestaurantAPI {
                 },
             });
 
-            if (!response.ok && !response.status == 401) {
-                console.log('Response: ', response);
-                throw new Error(`API Error: ${response.statusText}`);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.error || errorData.message || response.statusText;
+                throw new Error(errorMessage);
             }
 
             return await response.json();

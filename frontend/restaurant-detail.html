@@ -669,10 +669,10 @@
                 }
 
                 const reviewText = document.getElementById('review-text').value.trim();
-                const userId = api.getCurrentUserId();
+                const userId = parseInt(api.getCurrentUserId());
 
                 try {
-                    await api.submitReview(userId, currentRestaurantId, rating, reviewText);
+                    await api.submitReview(userId, parseInt(currentRestaurantId), rating, reviewText);
                     alert('Review submitted successfully!');
                     
                     document.getElementById('review-text').value = '';
