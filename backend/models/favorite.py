@@ -45,16 +45,49 @@ class Favorite:
         cursor = db.cursor(buffered=True)
         try:
             cursor.execute("""
-                SELECT r.RestaurantID, r.Name, r.PriceRange, r.AvgRating, 
-                       r.Cuisine, r.Location
+                SELECT 
+                    r.RestaurantID,
+                    r.Name,
+                    GROUP_CONCAT(DISTINCT c.CuisineType SEPARATOR ', ') AS Cuisine,
+                    a.Area AS Location,
+                    rt_summary.AvgRating,
+                    rt_summary.RatedBy,
+                    a.Latitude,
+                    a.Longitude
                 FROM restaurant r
-                INNER JOIN favorite f ON r.RestaurantID=f.RestaurantID
-                WHERE f.UserID=%s
+                INNER JOIN favorite f ON r.RestaurantID = f.RestaurantID
+                LEFT JOIN address a ON r.AddressID = a.AddressID
+                LEFT JOIN restaurantcuisine rc ON r.RestaurantID = rc.RestaurantID
+                LEFT JOIN cuisine c ON rc.CuisineID = c.CuisineID
+                LEFT JOIN (
+                    SELECT 
+                        RestaurantID,
+                        ROUND(AVG(RatingScore), 1) AS AvgRating,
+                        COUNT(*) AS RatedBy
+                    FROM rating
+                    GROUP BY RestaurantID
+                ) rt_summary ON r.RestaurantID = rt_summary.RestaurantID
+                WHERE f.UserID = %s
+                GROUP BY r.RestaurantID, r.Name, a.Area, a.Latitude, a.Longitude
             """, (user_id,))
             rows = cursor.fetchall()
             cursor.close()
-            keys = ["RestaurantID", "restaurant_name", "PriceRange", "AvgRating", "cuisine", "location"]
-            return [dict(zip(keys, r)) for r in rows]
+            
+            favorites = []
+            for r in rows:
+                rid, name, cuisine, location, avg_rating, rated_by, lat, lon = r
+                favorites.append({
+                    "RestaurantID": rid,
+                    "restaurant_name": name,
+                    "cuisine": cuisine or "N/A",
+                    "location": location or "N/A",
+                    "AvgRating": float(avg_rating) if avg_rating is not None else None,
+                    "RatedBy": rated_by if rated_by is not None else 0,
+                    "Latitude": float(lat) if lat else None,
+                    "Longitude": float(lon) if lon else None
+                })
+            return favorites
         except Exception as e:
+            print(f"Error fetching favorites: {e}")
             cursor.close()
             return []
