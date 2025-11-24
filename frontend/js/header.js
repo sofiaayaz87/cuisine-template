@@ -46,10 +46,10 @@ class AppHeader {
 
     getUserInitials() {
         if (!this.user) return '';
-        
+
         const firstName = this.user.FirstName || this.user.first_name || '';
         const lastName = this.user.LastName || this.user.last_name || '';
-        
+
         if (firstName && lastName) {
             return (firstName[0] + lastName[0]).toUpperCase();
         } else if (firstName) {
@@ -58,22 +58,22 @@ class AppHeader {
             const email = this.user.Email || this.user.email;
             return email.substring(0, 2).toUpperCase();
         }
-        
+
         return 'U';
     }
 
     getUserName() {
         if (!this.user) return '';
-        
+
         const firstName = this.user.FirstName || this.user.first_name || '';
         const lastName = this.user.LastName || this.user.last_name || '';
-        
+
         if (firstName && lastName) {
             return `${firstName} ${lastName}`;
         } else if (firstName) {
             return firstName;
         }
-        
+
         return 'User';
     }
 
@@ -110,7 +110,7 @@ class AppHeader {
 
         return `
             <header class="app-header">
-                <a href="/" class="app-logo">🍽️ Cuisine</a>
+                <a href="/" class="nav-brand">🍽️ MealMap</a>
                 <nav class="app-nav">
                     ${navHTML}
                     ${userMenuHTML}

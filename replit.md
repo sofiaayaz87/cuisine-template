@@ -1,7 +1,7 @@
-# Smart Restaurant Finder
+# MealMap - Smart Restaurant Finder
 
 ## Overview
-A full-stack restaurant discovery platform combining a beautiful Framer-based frontend with a Flask REST API backend. Users can search for restaurants, view menus, make reservations, save favorites, and discover promotions.
+MealMap is a full-stack restaurant discovery platform combining a beautiful Framer-based frontend with a Flask REST API backend. Users can search for restaurants, view menus, make reservations, save favorites, and discover promotions.
 
 ## Project Structure
 
