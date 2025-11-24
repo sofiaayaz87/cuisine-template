@@ -17,6 +17,13 @@ class AppHeader {
         return this.api ? this.api.getCurrentUserId() : null;
     }
 
+    isOwner() {
+        // Check if user has 'owner' role
+        if (!this.user) return false;
+        const role = this.user.Role || this.user.role;
+        return role === 'owner';
+    }
+
     getNavLinks() {
         const baseLinks = [
             { href: '/', text: 'Home', icon: '🏠' },
@@ -27,7 +34,7 @@ class AppHeader {
             { href: '/my-reservations', text: 'My Reservations', icon: '📅' },
             { href: '/favorites', text: 'Favorites', icon: '❤️' },
             { href: '/promotions', text: 'Promotions', icon: '🎉' },
-            { href: '/owner-dashboard', text: 'Owner Dashboard', icon: '🏪' },
+            ...(this.isOwner() ? [{ href: '/owner-dashboard', text: 'Owner Dashboard', icon: '🏪' }] : []),
             { href: '/dashboard', text: 'Dashboard', icon: '👤' }
         ] : [
             { href: '/promotions', text: 'Promotions', icon: '🎉' },
