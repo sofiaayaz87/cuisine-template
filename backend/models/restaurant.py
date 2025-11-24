@@ -21,7 +21,8 @@ class Restaurant:
                  Location=None,
                  Rating=None,
                  Latitude=None,
-                 Longitude=None):
+                 Longitude=None,
+                 OwnerID=None):
         self.RestaurantID = RestaurantID
         self.Name = Name
         self.Description = Description
@@ -30,6 +31,7 @@ class Restaurant:
         self.Rating = Rating
         self.Latitude = Latitude
         self.Longitude = Longitude
+        self.OwnerID = OwnerID
 
     # ----------------------------------------------------
     # Add a new restaurant
@@ -174,6 +176,121 @@ class Restaurant:
         except Exception as e:
             print("Error fetching restaurant by ID:", e)
             return None
+
+    # ----------------------------------------------------
+    # Get restaurants owned by a specific user
+    # ----------------------------------------------------
+    @staticmethod
+    def get_restaurants_by_owner(owner_id):
+        try:
+            cursor = db.cursor(buffered=True)
+            sql = """
+                SELECT 
+                    r.RestaurantID,
+                    r.Name,
+                    r.OwnerID,
+                    GROUP_CONCAT(DISTINCT c.CuisineType SEPARATOR ', ') AS Cuisine,
+                    a.Area AS Location,
+                    a.StreetAddress,
+                    a.City,
+                    a.Latitude,
+                    a.Longitude,
+                    rt_summary.AvgRating,
+                    rt_summary.RatedBy
+                FROM restaurant r
+                LEFT JOIN address a ON r.AddressID = a.AddressID
+                LEFT JOIN restaurantcuisine rc ON r.RestaurantID = rc.RestaurantID
+                LEFT JOIN cuisine c ON rc.CuisineID = c.CuisineID
+                LEFT JOIN (
+                    SELECT 
+                        RestaurantID,
+                        ROUND(AVG(RatingScore), 1) AS AvgRating,
+                        COUNT(*) AS RatedBy
+                    FROM rating
+                    GROUP BY RestaurantID
+                ) rt_summary ON r.RestaurantID = rt_summary.RestaurantID
+                WHERE r.OwnerID = %s
+                GROUP BY r.RestaurantID, r.Name, r.OwnerID, a.Area, a.StreetAddress, a.City, a.Latitude, a.Longitude
+            """
+            cursor.execute(sql, (owner_id,))
+            rows = cursor.fetchall()
+            cursor.close()
+
+            restaurants = []
+            for r in rows:
+                rid, name, owner_id, cuisine, area, street, city, lat, lon, rating, rated_by = r
+                restaurants.append({
+                    "RestaurantID": rid,
+                    "Name": name,
+                    "OwnerID": owner_id,
+                    "Cuisine": cuisine or "N/A",
+                    "Location": area or "N/A",
+                    "StreetAddress": street or "N/A",
+                    "City": city or "N/A",
+                    "Latitude": float(lat) if lat else None,
+                    "Longitude": float(lon) if lon else None,
+                    "Rating": float(rating) if rating is not None else None,
+                    "RatedBy": rated_by if rated_by is not None else 0
+                })
+            return restaurants
+
+        except Exception as e:
+            print("Error fetching restaurants by owner:", e)
+            return []
+
+    # ----------------------------------------------------
+    # Update restaurant information (owner only)
+    # ----------------------------------------------------
+    @staticmethod
+    def update_restaurant(restaurant_id, **kwargs):
+        try:
+            allowed_fields = ['Name', 'Description']
+            updates = []
+            values = []
+            
+            for field, value in kwargs.items():
+                if field in allowed_fields and value is not None:
+                    updates.append(f"{field} = %s")
+                    values.append(value)
+            
+            if not updates:
+                return False, "No valid fields to update"
+            
+            values.append(restaurant_id)
+            cursor = db.cursor(buffered=True)
+            sql = f"UPDATE restaurant SET {', '.join(updates)} WHERE RestaurantID = %s"
+            cursor.execute(sql, tuple(values))
+            db.commit()
+            affected = cursor.rowcount
+            cursor.close()
+            
+            if affected > 0:
+                return True, "Restaurant updated successfully"
+            return False, "Restaurant not found"
+            
+        except Exception as e:
+            print("Error updating restaurant:", e)
+            return False, str(e)
+
+    # ----------------------------------------------------
+    # Verify restaurant ownership
+    # ----------------------------------------------------
+    @staticmethod
+    def verify_ownership(restaurant_id, owner_id):
+        try:
+            cursor = db.cursor(buffered=True)
+            cursor.execute("SELECT OwnerID FROM restaurant WHERE RestaurantID = %s", (restaurant_id,))
+            result = cursor.fetchone()
+            cursor.close()
+            
+            if not result:
+                return False
+            
+            return result[0] == owner_id
+            
+        except Exception as e:
+            print("Error verifying ownership:", e)
+            return False
 
     # ----------------------------------------------------
     # Get restaurants with distance from user

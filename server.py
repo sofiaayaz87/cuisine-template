@@ -26,6 +26,7 @@ URL_REWRITES = {
     '/dashboard': '/dashboard.html',
     '/profile': '/profile.html',
     '/my-reservations': '/my-reservations.html',
+    '/owner-dashboard': '/owner-dashboard.html',
 }
 
 class ProxyHandler(http.server.SimpleHTTPRequestHandler):

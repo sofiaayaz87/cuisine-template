@@ -67,6 +67,7 @@ MealMap is a full-stack restaurant discovery platform combining a beautiful Fram
 7. **Menu Browsing**: View restaurant menus
 8. **Recommendations**: Get personalized restaurant suggestions
 9. **Reviews & Ratings**: Customers can rate and review restaurants (MVP - see SECURITY_NOTES.md)
+10. **Restaurant Owner Dashboard**: Owners can manage their restaurants, reservations, and menus
 
 ## API Endpoints
 
@@ -100,6 +101,17 @@ MealMap is a full-stack restaurant discovery platform combining a beautiful Fram
 - `POST /ratings/add` - Submit or update a rating/review (⚠️ MVP only - see SECURITY_NOTES.md)
 - `GET /ratings/restaurant/<restaurant_id>` - Get all reviews for a restaurant
 - `GET /ratings/user/<user_id>/restaurant/<restaurant_id>` - Get user's rating for a restaurant
+
+### Restaurant Owners (Owner Dashboard)
+- `GET /owners/restaurants/<owner_id>` - Get all restaurants owned by a user
+- `PUT /owners/restaurant/<restaurant_id>` - Update restaurant information (requires ownership verification)
+- `GET /owners/restaurant/<restaurant_id>/reservations` - Get reservations for owner's restaurant
+- `POST /owners/reservation/<reservation_id>/confirm` - Confirm a reservation
+- `POST /owners/reservation/<reservation_id>/cancel` - Cancel a reservation
+- `POST /owners/restaurant/<restaurant_id>/menu/add` - Add a new menu item
+- `PUT /owners/menu/item/<item_id>` - Update menu item
+- `DELETE /owners/menu/item/<item_id>` - Delete menu item
+- `POST /owners/menu/item/<item_id>/toggle` - Toggle menu item availability
 
 ## Environment Configuration
 
@@ -150,6 +162,9 @@ The "Start Web Server" workflow executes `bash start.sh` which:
 3. **Sign Up** (`/signup.html`) - New user registration
 4. **Favorites** (`/favorites.html`) - Saved restaurants
 5. **Promotions** (`/promotions.html`) - Active deals and offers
+6. **Owner Dashboard** (`/owner-dashboard.html`) - Restaurant owner management interface
+7. **My Reservations** (`/my-reservations.html`) - User's reservation history
+8. **Restaurant Detail** (`/restaurant-detail.html`) - Individual restaurant page with booking
 
 ### Template Pages (Framer Showcase)
 1. **Home** (`/`) - Beautiful Framer template homepage
@@ -160,6 +175,28 @@ The "Start Web Server" workflow executes `bash start.sh` which:
 6. **Book** (`/book/`) - Booking page template
 
 ## Recent Changes
+
+### 2025-11-24: Restaurant Owner Dashboard Implementation ✅
+- **Owner Management System Added**
+  - Created SQL migration script (`backend/migrations/001_add_owner_id_to_restaurant.sql`) to add OwnerID foreign key to restaurant table
+  - Added ownership verification methods to Restaurant model
+  - Implemented complete owner API endpoints in `/owners` blueprint:
+    - View owned restaurants
+    - Update restaurant information (name, description)
+    - View and manage reservations (confirm, cancel with customer details)
+    - Full menu CRUD operations (add, edit, delete, toggle availability)
+  - Built comprehensive Owner Dashboard frontend (`/owner-dashboard.html`) with:
+    - Restaurant selector for multi-restaurant owners
+    - Tabbed interface (Restaurant Info, Reservations, Menu Management)
+    - Reservation management with status filters (All, Pending, Confirmed, Cancelled)
+    - Menu item management with add/edit modal and availability toggle
+  - Added "Owner Dashboard" link to navigation header
+  - All owner actions require ownership verification on backend for security
+
+- **⚠️ SECURITY NOTE:**
+  - Owner endpoints use OwnerID from request body (client-supplied)
+  - Safe for MVP/development but requires JWT/session authentication before production
+  - Ownership verification prevents unauthorized actions but auth layer needed for full security
 
 ### 2025-11-24: Restaurant Discovery Platform Transformation ✅
 - **Homepage Redesigned** - Transformed from single-restaurant website to restaurant discovery platform

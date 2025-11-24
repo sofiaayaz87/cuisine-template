@@ -149,3 +149,58 @@ class Reservation:
         except:
             cursor.close()
             return False
+
+    # Get reservations for a restaurant (owner view)
+    @staticmethod
+    def get_for_restaurant(restaurant_id, status_filter=None):
+        cursor = db.cursor(buffered=True)
+        if status_filter:
+            cursor.execute(
+                """SELECT 
+                    r.ReservationID, r.RestaurantID, r.UserID, r.TableID, r.GuestCount,
+                    r.ReservationTime, r.Status, r.CreatedAt, r.Notes,
+                    u.FirstName, u.LastName, u.Email, u.ContactNo,
+                    rt.TableNumber
+                   FROM reservation r
+                   LEFT JOIN useraccount u ON r.UserID = u.Id
+                   LEFT JOIN restauranttable rt ON r.TableID = rt.TableID
+                   WHERE r.RestaurantID=%s AND r.Status=%s 
+                   ORDER BY r.ReservationTime DESC""",
+                (restaurant_id, status_filter)
+            )
+        else:
+            cursor.execute(
+                """SELECT 
+                    r.ReservationID, r.RestaurantID, r.UserID, r.TableID, r.GuestCount,
+                    r.ReservationTime, r.Status, r.CreatedAt, r.Notes,
+                    u.FirstName, u.LastName, u.Email, u.ContactNo,
+                    rt.TableNumber
+                   FROM reservation r
+                   LEFT JOIN useraccount u ON r.UserID = u.Id
+                   LEFT JOIN restauranttable rt ON r.TableID = rt.TableID
+                   WHERE r.RestaurantID=%s 
+                   ORDER BY r.ReservationTime DESC""",
+                (restaurant_id,)
+            )
+        rows = cursor.fetchall()
+        cursor.close()
+        
+        keys = ["ReservationID","RestaurantID","UserID","TableID","GuestCount",
+                "ReservationTime","Status","CreatedAt","Notes",
+                "CustomerFirstName","CustomerLastName","CustomerEmail","CustomerPhone",
+                "TableNumber"]
+        return [dict(zip(keys, r)) for r in rows]
+
+    # Confirm reservation (owner action)
+    @staticmethod
+    def confirm_reservation(reservation_id):
+        cursor = db.cursor(buffered=True)
+        try:
+            cursor.execute("UPDATE reservation SET Status='Confirmed' WHERE ReservationID=%s", (reservation_id,))
+            db.commit()
+            affected = cursor.rowcount
+            cursor.close()
+            return affected > 0
+        except:
+            cursor.close()
+            return False
