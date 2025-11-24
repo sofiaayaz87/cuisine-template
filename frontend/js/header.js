@@ -89,8 +89,8 @@ class AppHeader {
         const links = this.getNavLinks();
 
         const navHTML = links.map(link => {
-            const isActive = link.href === currentPath || 
-                           (link.href !== '/' && currentPath.startsWith(link.href));
+            const isActive = link.href === currentPath ||
+                (link.href !== '/' && currentPath.startsWith(link.href));
             return `
                 <a href="${link.href}" class="${isActive ? 'active' : ''}">
                     ${link.text}
@@ -110,7 +110,7 @@ class AppHeader {
 
         return `
             <header class="app-header">
-                <a href="/" class="nav-brand">🍽️ MealMap</a>
+             <a href="/" class="app-logo">🍽️ MealMap</a>
                 <nav class="app-nav">
                     ${navHTML}
                     ${userMenuHTML}
