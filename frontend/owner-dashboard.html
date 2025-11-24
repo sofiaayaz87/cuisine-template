@@ -1050,8 +1050,12 @@
                 e.preventDefault();
                 
                 const promotionId = document.getElementById('promotion-id').value;
-                const validFrom = new Date(document.getElementById('promo-valid-from').value).toISOString();
-                const validTo = new Date(document.getElementById('promo-valid-to').value).toISOString();
+                
+                // Convert datetime-local to MySQL format (YYYY-MM-DD HH:MM:SS)
+                const validFromInput = document.getElementById('promo-valid-from').value;
+                const validToInput = document.getElementById('promo-valid-to').value;
+                const validFrom = validFromInput.replace('T', ' ') + ':00';
+                const validTo = validToInput.replace('T', ' ') + ':00';
                 
                 const formData = {
                     RestaurantID: currentRestaurant,
