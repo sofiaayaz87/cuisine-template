@@ -14,11 +14,16 @@
         }
 
         .restaurant-hero {
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: white;
             padding: var(--spacing-3xl) var(--spacing-lg);
             margin-bottom: var(--spacing-xl);
             position: relative;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
         }
 
         .restaurant-hero::before {
@@ -28,7 +33,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 100%);
+            background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.35) 100%);
             pointer-events: none;
         }
 
@@ -118,6 +123,40 @@
             font-size: 1.1rem;
             font-family: var(--font-body);
             margin-top: var(--spacing-sm);
+        }
+
+        .promo-badges {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: var(--spacing-lg) 0;
+            align-items: flex-start;
+        }
+
+        .discount-badge-hero {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 24px;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .date-badge-hero {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .review-form {
@@ -335,6 +374,7 @@
                         📍 <span id="restaurant-location"></span>
                     </div>
                 </div>
+                <div id="promo-badges-container" class="promo-badges" style="display: none;"></div>
                 <button id="favorite-btn-hero" class="favorite-btn-hero" onclick="toggleFavoriteDetail()" style="display: none;">
                     <span id="favorite-icon">🤍</span>
                     <span id="favorite-text">Add to Favorites</span>
@@ -430,6 +470,34 @@
         let ratingComponent = null;
         let isFavorite = false;
 
+        // Cuisine to background image mapping
+        const cuisineImageMap = {
+            'seafood': '/images/seafood_restaurant_f_38b8b3ff.jpg',
+            'fast food': '/images/restaurant_food_dini_af3284cb.jpg',
+            'italian': '/images/italian_cuisine_past_af4c10ac.jpg',
+            'indian': '/images/indian_curry_spices__37de17ac.jpg',
+            'chinese': '/images/chinese_asian_cuisin_ff1b32d1.jpg',
+            'korean': '/images/korean_bbq_meat_rest_d71b5d47.jpg',
+            'japanese': '/images/japanese_sushi_platt_08a94623.jpg',
+            'mexican': '/images/mexican_tacos_food_c_bfd6d335.jpg',
+            'middle eastern': '/images/middle_eastern_hummu_226ace75.jpg',
+            'bbq': '/images/bbq_grilled_meat_bar_62e30329.jpg',
+            'pakistani': '/images/indian_curry_spices__37de17ac.jpg',
+            'default': '/images/italian_cuisine_past_af4c10ac.jpg'
+        };
+
+        function getCuisineBackgroundImage(cuisineString) {
+            if (!cuisineString) return cuisineImageMap['default'];
+            const cuisines = cuisineString.toLowerCase().split(',');
+            for (let cuisine of cuisines) {
+                const trimmed = cuisine.trim();
+                if (cuisineImageMap[trimmed]) {
+                    return cuisineImageMap[trimmed];
+                }
+            }
+            return cuisineImageMap['default'];
+        }
+
         async function loadRestaurantDetails() {
             const params = new URLSearchParams(window.location.search);
             const restaurantId = params.get('id');
@@ -449,12 +517,27 @@
                 document.getElementById('restaurant-cuisine').textContent = restaurant.Cuisine || 'Various';
                 document.getElementById('restaurant-location').textContent = restaurant.Location || 'Unknown';
 
+                // Set background image based on cuisine
+                const backgroundImage = getCuisineBackgroundImage(restaurant.Cuisine);
+                document.getElementById('restaurant-hero').style.backgroundImage = `url('${backgroundImage}')`;
+
                 if (restaurant.Rating) {
                     document.getElementById('restaurant-rating').innerHTML = StarRating.display(restaurant.Rating, 20);
                     document.getElementById('restaurant-rating-count').textContent = `(${restaurant.RatedBy || 0} reviews)`;
                 } else {
                     document.getElementById('restaurant-rating').innerHTML = StarRating.display(0, 20);
                     document.getElementById('restaurant-rating-count').textContent = '(No reviews yet)';
+                }
+
+                // Display promotion badges
+                if (restaurant.ActiveDiscount) {
+                    const badgesContainer = document.getElementById('promo-badges-container');
+                    let badgesHTML = `<div class="discount-badge-hero">🎉 ${restaurant.ActiveDiscount}% OFF</div>`;
+                    if (restaurant.PromotionValidFrom && restaurant.PromotionValidTo) {
+                        badgesHTML += `<div class="date-badge-hero">📅 ${restaurant.PromotionValidFrom} - ${restaurant.PromotionValidTo}</div>`;
+                    }
+                    badgesContainer.innerHTML = badgesHTML;
+                    badgesContainer.style.display = 'flex';
                 }
 
                 await loadMenu(restaurantId);

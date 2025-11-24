@@ -147,12 +147,19 @@ class Restaurant:
                     a.Longitude,
 
                     rt_summary.AvgRating,
-                    rt_summary.RatedBy
+                    rt_summary.RatedBy,
+                    MAX(p.Discount) AS ActiveDiscount,
+                    MAX(p.ValidFrom) AS PromotionValidFrom,
+                    MAX(p.ValidTo) AS PromotionValidTo
 
                 FROM restaurant r
                 LEFT JOIN address a ON r.AddressID = a.AddressID
                 LEFT JOIN restaurantcuisine rc ON r.RestaurantID = rc.RestaurantID
                 LEFT JOIN cuisine c ON rc.CuisineID = c.CuisineID
+                LEFT JOIN promotion p ON r.RestaurantID = p.RestaurantID 
+                    AND p.IsActive = 1 
+                    AND p.ValidFrom <= NOW() 
+                    AND p.ValidTo >= NOW()
 
                 LEFT JOIN (
                     SELECT 
@@ -171,7 +178,7 @@ class Restaurant:
             cursor.close()
 
             if row:
-                rid, name, cuisine, area, street, city, lat, lon, rating, rated_by = row
+                rid, name, cuisine, area, street, city, lat, lon, rating, rated_by, discount, valid_from, valid_to = row
                 return {
                     "RestaurantID": rid,
                     "Name": name,
@@ -182,7 +189,10 @@ class Restaurant:
                     "Latitude": float(lat) if lat else None,
                     "Longitude": float(lon) if lon else None,
                     "Rating": float(rating) if rating is not None else None,
-                    "RatedBy": rated_by if rated_by is not None else 0
+                    "RatedBy": rated_by if rated_by is not None else 0,
+                    "ActiveDiscount": float(discount) if discount is not None else None,
+                    "PromotionValidFrom": valid_from.strftime('%m/%d') if valid_from else None,
+                    "PromotionValidTo": valid_to.strftime('%m/%d') if valid_to else None
                 }
             return None
 

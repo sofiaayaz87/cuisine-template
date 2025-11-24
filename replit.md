@@ -21,7 +21,7 @@ MealMap is a full-stack restaurant discovery platform designed to connect users 
 - **Pages**:
     - **Functional**: Restaurants search/browse, Login, Sign Up, Favorites, Promotions, Owner Dashboard, My Reservations, Restaurant Detail. These pages are integrated with the backend API.
     - **Template (Framer Showcase)**: Home, About, Menu, Blog, Contact, Book. These serve as visual templates.
-- **UI/UX Decisions**: Redesigned homepage for restaurant discovery, enhanced restaurant listing and detail pages with features like favorite buttons, and an integrated booking section that requires user authentication. Image management includes cuisine-specific stock images.
+- **UI/UX Decisions**: Redesigned homepage for restaurant discovery, enhanced restaurant listing and detail pages with features like favorite buttons, and an integrated booking section that requires user authentication. Image management includes cuisine-specific stock images. Modern discount badges with date ranges displayed on restaurant cards and detail pages. Dynamic background images on restaurant detail hero sections based on cuisine type with low transparency overlay (25-35% opacity).
 
 ### Backend
 - **Framework**: Flask 3.1.2, serving as a REST API.
@@ -43,6 +43,7 @@ MealMap is a full-stack restaurant discovery platform designed to connect users 
 ### Integration Architecture
 - **Proxy Server**: `server.py` acts as a proxy, forwarding `/api/*` requests from the frontend (port 5000) to the internal Flask backend (port 8000). This setup addresses CORS issues, works within the Replit environment, and ensures a clean separation of concerns.
 - **Dual Server Workflow**: `start.sh` script concurrently runs the Flask backend on port 8000 and the frontend HTTP server on port 5000.
+- **Database Optimization**: Promotions are now fetched using LEFT JOINs in the restaurant queries, reducing N+1 query problems and improving performance. Active promotions are filtered by `IsActive = 1` and date conditions (`ValidFrom <= NOW() AND ValidTo >= NOW()`) at the database level.
 
 ### Environment Configuration
 - **Secrets**: Database credentials (`MYSQL_HOST`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`, `MYSQL_PORT`) are stored as Replit Secrets.
@@ -51,3 +52,16 @@ MealMap is a full-stack restaurant discovery platform designed to connect users 
 - **Database**: MySQL (configured for external hosting like Railway or AWS RDS).
 - **Backend Libraries**: Flask, Flask-CORS.
 - **Frontend Libraries**: None explicitly listed beyond Vanilla JavaScript and custom CSS, implying self-contained static assets.
+
+## Recent Enhancements (November 2025)
+
+### Promotions & Discounts Display
+- **Restaurant Cards**: Modern discount badges display active promotions with discount percentage and valid date ranges (MM/DD - MM/DD format) on both restaurant listing and favorites pages
+- **Restaurant Detail Pages**: Hero section now shows discount badges and date ranges below restaurant rating information
+- **Dynamic Background Images**: Restaurant detail pages display cuisine-specific background images with low transparency overlay (0.25-0.35 opacity) for better visual appeal while maintaining text readability
+
+### Database Performance Optimization
+- Promotions are now fetched using LEFT JOINs with active promotion filters directly in the restaurant query
+- Eliminates separate API calls for promotions data per restaurant
+- Date-based filtering happens at the database level using SQL NOW() function
+- Significantly improves page load performance, especially on restaurant listing pages
