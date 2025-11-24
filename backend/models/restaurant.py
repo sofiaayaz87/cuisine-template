@@ -67,11 +67,18 @@ class Restaurant:
                     rt_summary.AvgRating,
                     rt_summary.RatedBy,
                     a.Latitude,
-                    a.Longitude
+                    a.Longitude,
+                    MAX(p.Discount) AS ActiveDiscount,
+                    MAX(p.ValidFrom) AS PromotionValidFrom,
+                    MAX(p.ValidTo) AS PromotionValidTo
                 FROM restaurant r
                 LEFT JOIN address a ON r.AddressID = a.AddressID
                 LEFT JOIN restaurantcuisine rc ON r.RestaurantID = rc.RestaurantID
                 LEFT JOIN cuisine c ON rc.CuisineID = c.CuisineID
+                LEFT JOIN promotion p ON r.RestaurantID = p.RestaurantID 
+                    AND p.IsActive = 1 
+                    AND p.ValidFrom <= NOW() 
+                    AND p.ValidTo >= NOW()
 
                 LEFT JOIN (
                     SELECT 
@@ -90,7 +97,7 @@ class Restaurant:
 
             restaurants = []
             for r in rows:
-                rid, name, cuisine, loc, rating, RatedBy, lat, lon = r
+                rid, name, cuisine, loc, rating, RatedBy, lat, lon, discount, valid_from, valid_to = r
                 restaurants.append({
                     "RestaurantID":
                     rid,
@@ -107,7 +114,13 @@ class Restaurant:
                     "Latitude":
                     float(lat) if lat else None,
                     "Longitude":
-                    float(lon) if lon else None
+                    float(lon) if lon else None,
+                    "ActiveDiscount":
+                    float(discount) if discount is not None else None,
+                    "PromotionValidFrom":
+                    valid_from.strftime('%m/%d') if valid_from else None,
+                    "PromotionValidTo":
+                    valid_to.strftime('%m/%d') if valid_to else None
                 })
             return restaurants
 

@@ -168,6 +168,42 @@
         .menu-item-card {
             position: relative;
         }
+
+        .badge-group {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 8;
+        }
+
+        .discount-badge {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .date-badge {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
     </style>
 </head>
 <body>
@@ -329,8 +365,22 @@
                 const cuisineImage = getCuisineImage(restaurant.Cuisine);
                 const isFavorite = userFavorites.has(restaurant.RestaurantID);
                 
+                let badgesHTML = '';
+                if (restaurant.ActiveDiscount) {
+                    badgesHTML = `
+                        <div class="badge-group">
+                            <div class="discount-badge">🎉 ${restaurant.ActiveDiscount}% OFF</div>
+                            ${restaurant.PromotionValidFrom && restaurant.PromotionValidTo 
+                                ? `<div class="date-badge">📅 ${restaurant.PromotionValidFrom} - ${restaurant.PromotionValidTo}</div>`
+                                : ''
+                            }
+                        </div>
+                    `;
+                }
+                
                 return `
                     <div class="menu-item-card" onclick="viewRestaurant(${restaurant.RestaurantID})">
+                        ${badgesHTML}
                         <button class="favorite-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite(${restaurant.RestaurantID}, event)" title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
                             ${isFavorite ? '❤️' : '🤍'}
                         </button>
