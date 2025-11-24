@@ -161,6 +161,36 @@ The "Start Web Server" workflow executes `bash start.sh` which:
 
 ## Recent Changes
 
+### 2025-11-24: Restaurant Discovery Platform Transformation ✅
+- **Homepage Redesigned** - Transformed from single-restaurant website to restaurant discovery platform
+  - Hero section: "Discover Your Next Favorite Restaurant"
+  - Highlights core features: find nearby restaurants, book tables, save favorites
+  - Cuisine exploration: Italian, Chinese, Indian, Japanese categories (vs menu categories)
+  - "Why Choose Us" section: Find Nearby, Instant Booking, Save Favorites, Promotions
+  
+- **Restaurant Listing Page Updates**
+  - Title changed: "Our Menu" → "Discover Restaurants"
+  - Description updated to reflect restaurant discovery purpose
+  - Cuisine filters: Italian, Chinese, Indian, Middle Eastern, BBQ, Korean (vs Breakfast, Main Dishes, etc.)
+  - Added cuisine-based stock images to restaurant cards
+  - Added favorite heart buttons on each restaurant card with toggle functionality
+  - Implemented proper async loading to show saved favorites on page load
+  
+- **Restaurant Detail Page Enhancements**
+  - Added favorite button in hero section with toggle functionality
+  - Implemented "Book a Table" section with:
+    - Date and time picker
+    - Guest count selector (1-9+ guests)
+    - Special requests textarea
+    - **Authentication required**: Non-logged-in users see login prompt instead of booking form
+  - Booking form only visible to authenticated users
+  - Successful bookings redirect to "My Reservations" page
+  
+- **Image Management**
+  - Added cuisine-specific stock images mapped to restaurant cuisines
+  - Images stored in `/frontend/images/cuisine/` directory
+  - Fallback image for restaurants without matching cuisine types
+
 ### 2025-11-23: Reviews & Ratings System Added ⚠️
 - **Customer Reviews Feature (MVP/Development Only)**
   - Added rating model and database table for customer reviews

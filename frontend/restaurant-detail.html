@@ -345,7 +345,15 @@
         <div class="container">
             <section class="content-section booking-section" id="booking-section">
                 <h2>Book a Table</h2>
-                <form id="booking-form" class="booking-form">
+                
+                <div id="booking-login-prompt" style="display: none; text-align: center; padding: var(--spacing-xl);">
+                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: var(--spacing-lg);">
+                        Please log in to make a reservation
+                    </p>
+                    <a href="/login" class="btn btn-primary btn-large">Login to Book</a>
+                </div>
+
+                <form id="booking-form" class="booking-form" style="display: none;">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="booking-date">Date</label>
@@ -456,8 +464,13 @@
                 if (api.isAuthenticated()) {
                     document.getElementById('review-form-container').style.display = 'block';
                     document.getElementById('favorite-btn-hero').style.display = 'inline-flex';
+                    document.getElementById('booking-form').style.display = 'grid';
+                    document.getElementById('booking-login-prompt').style.display = 'none';
                     initializeReviewForm();
                     initializeBookingForm();
+                } else {
+                    document.getElementById('booking-form').style.display = 'none';
+                    document.getElementById('booking-login-prompt').style.display = 'block';
                 }
 
             } catch (error) {
