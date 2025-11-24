@@ -4,30 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Favorites - Smart Restaurant Finder</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/shared-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Page-specific styles - shared header styles come from shared-styles.css */
-        body {
-            padding-top: 70px; /* Space for fixed shared header */
-        }
-
-        .hero {
-            background: linear-gradient(135deg, #5a6f4c 0%, #7a8f6c 100%);
-            color: white;
-            padding: 3rem 2rem;
+        .page-hero {
+            background-color: var(--color-cream);
+            padding: 3rem 0;
             text-align: center;
         }
 
-        .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
+        .page-hero h1 {
+            margin-bottom: var(--spacing-md);
         }
 
-        .main-content {
+        .page-hero p {
+            color: var(--color-text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section {
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .container {
             max-width: 1200px;
-            margin: 3rem auto;
-            padding: 0 2rem;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
         }
 
         .favorites-grid {
@@ -37,23 +42,25 @@
         }
 
         .favorite-card {
-            background: white;
-            border-radius: 12px;
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
             overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
+            border: 1px solid var(--color-border-light);
+            transition: all var(--transition-normal);
             cursor: pointer;
         }
 
         .favorite-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            border-color: transparent;
         }
 
         .favorite-image {
             width: 100%;
-            height: 200px;
-            background-color: #e0e0e0;
+            height: 240px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #e8e6e1 0%, #f0eeea 100%);
         }
 
         .favorite-info {
@@ -61,90 +68,117 @@
         }
 
         .favorite-name {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
+            font-family: var(--font-heading);
+            font-size: 1.35rem;
             margin-bottom: 0.5rem;
+            color: var(--color-text-primary);
         }
 
         .favorite-details {
-            color: #666;
+            color: var(--color-text-secondary);
+            font-size: 0.95rem;
             margin-bottom: 0.5rem;
+            line-height: 1.6;
         }
 
         .remove-btn {
-            background-color: #c33;
+            background-color: var(--color-error);
             color: white;
             border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            margin-top: 1rem;
+            margin-top: var(--spacing-sm);
+            font-family: var(--font-body);
+            font-weight: 500;
+            transition: all var(--transition-normal);
         }
 
         .remove-btn:hover {
             background-color: #a22;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(204, 51, 51, 0.3);
         }
 
         .loading {
             text-align: center;
-            padding: 3rem;
+            padding: var(--spacing-xl);
             font-size: 1.2rem;
-            color: #666;
+            color: var(--color-text-muted);
         }
 
         .empty-state {
             text-align: center;
-            padding: 4rem 2rem;
+            padding: var(--spacing-2xl) var(--spacing-lg);
+            grid-column: 1 / -1;
         }
 
         .empty-state h2 {
-            font-family: 'Playfair Display', serif;
-            color: #999;
-            margin-bottom: 1rem;
+            font-family: var(--font-heading);
+            color: var(--color-text-muted);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .empty-state p {
+            color: var(--color-text-muted);
+            margin-bottom: var(--spacing-md);
         }
 
         .empty-state a {
             display: inline-block;
-            margin-top: 1rem;
-            padding: 1rem 2rem;
-            background-color: #d4792e;
+            margin-top: var(--spacing-sm);
+            padding: 0.875rem 2rem;
+            background-color: var(--color-accent);
             color: white;
             text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            transition: all var(--transition-normal);
+        }
+
+        .empty-state a:hover {
+            background-color: var(--color-accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
         }
 
         .error {
-            background-color: #fee;
-            border: 1px solid #fcc;
-            padding: 1rem;
-            border-radius: 8px;
-            color: #c33;
-            margin: 1rem 0;
+            background-color: var(--color-error-bg);
+            border: 1px solid var(--color-error);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
+            color: var(--color-error);
+            margin-bottom: var(--spacing-md);
         }
     </style>
 </head>
 <body>
-    <!-- Shared header will be inserted here by header.js -->
+    <div id="app-header"></div>
     
-    <div class="hero">
-        <h1>❤️ My Favorite Restaurants</h1>
-        <p>Your saved restaurants in one place</p>
+    <div class="page-hero">
+        <div class="container">
+            <h1>❤️ My Favorite Restaurants</h1>
+            <p>Your saved restaurants in one place</p>
+        </div>
     </div>
 
-    <div class="main-content">
-        <div id="errorContainer"></div>
-        <div id="loadingContainer" class="loading" style="display: none;">
-            Loading your favorites...
+    <section class="section">
+        <div class="container">
+            <div id="errorContainer"></div>
+            <div id="loadingContainer" class="loading" style="display: none;">
+                Loading your favorites...
+            </div>
+            <div id="favoritesGrid" class="favorites-grid"></div>
         </div>
-        <div id="favoritesGrid" class="favorites-grid"></div>
-    </div>
+    </section>
 
     <script src="/js/api-client.js"></script>
     <script src="/js/header.js"></script>
     <script>
+        window.appHeader = new AppHeader();
+        window.appHeader.mount();
+
         window.addEventListener('DOMContentLoaded', () => {
-            // Wait for api-client to be available
             if (!window.api) {
                 console.error('API client not loaded');
                 document.getElementById('favoritesGrid').innerHTML = `
@@ -156,14 +190,12 @@
                 return;
             }
             
-            initializeHeader();
-            
             const userId = window.api.getCurrentUserId();
             if (!userId) {
                 document.getElementById('favoritesGrid').innerHTML = `
                     <div class="empty-state">
                         <h2>Please login to view your favorites</h2>
-                        <a href="/login">Login Now</a>
+                        <a href="/login.html">Login Now</a>
                     </div>
                 `;
                 return;
@@ -228,11 +260,11 @@
             
             gridEl.innerHTML = favorites.map(fav => `
                 <div class="favorite-card">
-                    <div class="favorite-image" style="background: linear-gradient(135deg, #${Math.floor(Math.random()*16777215).toString(16)} 0%, #${Math.floor(Math.random()*16777215).toString(16)} 100%);"></div>
+                    <div class="favorite-image"></div>
                     <div class="favorite-info">
                         <h3 class="favorite-name">${fav.restaurant_name || 'Unknown'}</h3>
-                        <p class="favorite-details">${fav.cuisine || ''}</p>
-                        <p class="favorite-details">${fav.location || ''}</p>
+                        <p class="favorite-details">${fav.cuisine || 'Cuisine not specified'}</p>
+                        <p class="favorite-details">📍 ${fav.location || 'Location not specified'}</p>
                         <button class="remove-btn" onclick="removeFavorite(${userId}, ${fav.RestaurantID || fav.restaurant_id})">Remove from Favorites</button>
                     </div>
                 </div>
@@ -251,7 +283,7 @@
 
             try {
                 await window.api.removeFavorite(userId, restaurantId);
-                loadFavorites(); // Reload the list
+                loadFavorites();
             } catch (error) {
                 alert(`Error removing favorite: ${error.message}`);
                 console.error('Remove favorite error:', error);

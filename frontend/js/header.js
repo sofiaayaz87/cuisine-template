@@ -100,10 +100,9 @@ class AppHeader {
 
         const userMenuHTML = this.user ? `
             <div class="user-menu">
-                <span style="color: white; font-weight: 500;">${this.getUserName()}</span>
+                <span class="user-name">${this.getUserName()}</span>
                 <div class="user-avatar" title="${this.getUserName()}">${this.getUserInitials()}</div>
-                <button onclick="window.appHeader.logout()" 
-                        style="background: transparent; border: 1px solid white; color: white; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                <button onclick="window.appHeader.logout()" class="btn-logout">
                     Logout
                 </button>
             </div>
@@ -111,7 +110,7 @@ class AppHeader {
 
         return `
             <header class="app-header">
-                <a href="/" class="app-logo">🍽️ Smart Restaurant Finder</a>
+                <a href="/" class="app-logo">🍽️ Cuisine</a>
                 <nav class="app-nav">
                     ${navHTML}
                     ${userMenuHTML}

@@ -1,39 +1,122 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Restaurant Finder - Redirecting...</title>
-    <meta http-equiv="refresh" content="0; url=/restaurants">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f5f5f5;
-        }
-        .redirect-message {
-            text-align: center;
-            padding: 2rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-    </style>
-    <script>
-        // Immediate redirect
-        window.location.href = '/restaurants';
-    </script>
+    <title>Cuisine - Best Food for Your Taste</title>
+    <link rel="stylesheet" href="/css/shared-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="redirect-message">
-        <h1>Smart Restaurant Finder</h1>
-        <p>Redirecting to restaurant listings...</p>
-        <p>If you are not redirected automatically, <a href="/restaurants">click here</a>.</p>
-    </div>
+    <div id="app-header"></div>
+
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">Best food for<br>your taste</h1>
+            <p class="hero-subtitle">Discover delectable cuisine and unforgettable moments in our welcoming, culinary haven.</p>
+            <div class="hero-buttons">
+                <a href="/restaurants" class="btn btn-primary btn-large">Book A Table</a>
+                <a href="/restaurants" class="btn btn-secondary btn-large">Explore Menu</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-bg-white">
+        <div class="container">
+            <h2 class="section-title">Browse Our Menu</h2>
+            <div class="category-grid">
+                <div class="category-card" onclick="window.location.href='/restaurants?cuisine=breakfast'">
+                    <div class="category-icon">🍳</div>
+                    <h3 class="category-name">Breakfast</h3>
+                    <p class="category-description">Start your day deliciously with our carefully selected breakfast options.</p>
+                    <a href="/restaurants?cuisine=breakfast" class="explore-link">Explore Menu →</a>
+                </div>
+                
+                <div class="category-card" onclick="window.location.href='/restaurants?cuisine=main'">
+                    <div class="category-icon">🍽️</div>
+                    <h3 class="category-name">Main Dishes</h3>
+                    <p class="category-description">Savor the finest main courses with carefully selected ingredients.</p>
+                    <a href="/restaurants?cuisine=main" class="explore-link">Explore Menu →</a>
+                </div>
+                
+                <div class="category-card" onclick="window.location.href='/restaurants?cuisine=drinks'">
+                    <div class="category-icon">🍹</div>
+                    <h3 class="category-name">Drinks</h3>
+                    <p class="category-description">Refresh yourself with our handcrafted beverages and cocktails.</p>
+                    <a href="/restaurants?cuisine=drinks" class="explore-link">Explore Menu →</a>
+                </div>
+                
+                <div class="category-card" onclick="window.location.href='/restaurants?cuisine=dessert'">
+                    <div class="category-icon">🍰</div>
+                    <h3 class="category-name">Desserts</h3>
+                    <p class="category-description">Indulge in sweet delights that end your meal perfectly.</p>
+                    <a href="/restaurants?cuisine=dessert" class="explore-link">Explore Menu →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-bg-cream">
+        <div class="container">
+            <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+                <h2 style="margin-bottom: 1.5rem;">We provide healthy food for your family</h2>
+                <p style="color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.8; margin-bottom: 2rem;">
+                    Our story began with a vision to create a unique dining experience that merges fine dining, exceptional service, and a vibrant ambiance. Rooted in city's rich culinary culture, we aim to honor our local roots while infusing a global palate.
+                </p>
+                <p style="color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.8; margin-bottom: 2.5rem;">
+                    At place, we believe that dining is not just about food, but also about the overall experience. Our staff, renowned for their warmth and dedication, strives to make every visit an unforgettable event.
+                </p>
+                <a href="/restaurants" class="btn btn-primary btn-large">Book A Table</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-bg-white">
+        <div class="container">
+            <h2 class="section-title">We also offer unique<br>services for your events</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🎉</span>
+                    <h3 class="feature-title">Caterings</h3>
+                    <p class="feature-description">In the new era of technology we look in the future with certainty for life.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">🎂</span>
+                    <h3 class="feature-title">Birthdays</h3>
+                    <p class="feature-description">Make your special day memorable with our custom birthday packages.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">💑</span>
+                    <h3 class="feature-title">Weddings</h3>
+                    <p class="feature-description">Create the perfect wedding experience with our dedicated event planning.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">🎊</span>
+                    <h3 class="feature-title">Events</h3>
+                    <p class="feature-description">Host your corporate or social events in our elegant venues.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer style="background-color: var(--color-primary-dark); color: white; padding: var(--spacing-xl) 0; text-align: center;">
+        <div class="container">
+            <h3 style="color: white; font-family: var(--font-heading); margin-bottom: var(--spacing-md);">🍽️ Cuisine</h3>
+            <p style="color: rgba(255,255,255,0.8); margin-bottom: var(--spacing-sm);">In the new era of technology we look in the future with certainty and pride for our company and.</p>
+            <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">Copyright © 2025 Cuisine. All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <script src="/js/api-client.js"></script>
+    <script src="/js/header.js"></script>
+    <script>
+        window.appHeader = new AppHeader();
+        window.appHeader.mount();
+    </script>
 </body>
 </html>
