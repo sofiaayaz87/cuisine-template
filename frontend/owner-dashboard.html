@@ -485,7 +485,7 @@
         let currentFilter = '';
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (!api.isLoggedIn()) {
+            if (!api.isAuthenticated()) {
                 window.location.href = '/login';
                 return;
             }
