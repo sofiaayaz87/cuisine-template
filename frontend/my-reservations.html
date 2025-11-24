@@ -210,14 +210,22 @@
             emptyState.style.display = 'none';
             list.innerHTML = filteredReservations.map(reservation => {
                 const statusClass = `status-${reservation.Status.toLowerCase()}`;
-                const reservationDate = new Date(reservation.ReservationDate);
-                const formattedDate = reservationDate.toLocaleDateString('en-US', {
+                
+                // Parse ReservationTime which contains both date and time
+                const reservationDateTime = new Date(reservation.ReservationTime);
+                const formattedDate = reservationDateTime.toLocaleDateString('en-US', {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
                 });
-                const formattedTime = reservation.ReservationTime;
+                const formattedTime = reservationDateTime.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                // Use GuestCount from API response
+                const partySize = reservation.GuestCount || reservation.PartySize || 0;
 
                 return `
                     <div class="reservation-card">
@@ -248,15 +256,15 @@
                                 <span class="detail-icon">👥</span>
                                 <div>
                                     <div class="detail-text">Party Size</div>
-                                    <div class="detail-value">${reservation.PartySize} ${reservation.PartySize === 1 ? 'guest' : 'guests'}</div>
+                                    <div class="detail-value">${partySize} ${partySize === 1 ? 'guest' : 'guests'}</div>
                                 </div>
                             </div>
                         </div>
 
-                        ${reservation.SpecialRequests ? `
+                        ${reservation.Notes || reservation.SpecialRequests ? `
                             <div style="margin-top: var(--spacing-sm); padding-top: var(--spacing-sm); border-top: 1px solid var(--color-border-light);">
                                 <div class="detail-text">Special Requests</div>
-                                <p style="color: var(--color-text-primary); margin-top: 0.25rem;">${reservation.SpecialRequests}</p>
+                                <p style="color: var(--color-text-primary); margin-top: 0.25rem;">${reservation.Notes || reservation.SpecialRequests}</p>
                             </div>
                         ` : ''}
 

@@ -49,7 +49,20 @@ def create_reservation():
 # ------------------- GET RESERVATIONS FOR USER -------------------
 @reservations_bp.route("/user/<int:user_id>", methods=["GET"])
 def reservations_for_user(user_id):
+    from config import db
     reservations = Reservation.get_for_user(user_id)
+    
+    # Enrich reservations with restaurant names
+    cursor = db.cursor(buffered=True)
+    for reservation in reservations:
+        cursor.execute(
+            "SELECT RestaurantName FROM restaurant WHERE RestaurantID=%s",
+            (reservation['RestaurantID'],)
+        )
+        result = cursor.fetchone()
+        reservation['RestaurantName'] = result[0] if result else 'Restaurant'
+    cursor.close()
+    
     return jsonify(reservations), 200
 
 # ------------------- CANCEL RESERVATION -------------------
