@@ -15,6 +15,7 @@ def add_favorite():
     data = request.get_json(force=True)
     user_id = data.get("UserID")
     restaurant_id = data.get("RestaurantID")
+    print(f"Add favorite request - UserID: {user_id}, RestaurantID: {restaurant_id}, Data: {data}")
     if not user_id or not restaurant_id:
         return jsonify({"error":"UserID and RestaurantID required"}),400
     ok,msg = Favorite.add(user_id, restaurant_id)

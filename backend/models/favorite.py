@@ -45,14 +45,15 @@ class Favorite:
         cursor = db.cursor(buffered=True)
         try:
             cursor.execute("""
-                SELECT r.RestaurantID, r.Name, r.PriceRange, r.AvgRating
+                SELECT r.RestaurantID, r.Name, r.PriceRange, r.AvgRating, 
+                       r.Cuisine, r.Location
                 FROM restaurant r
                 INNER JOIN favorite f ON r.RestaurantID=f.RestaurantID
                 WHERE f.UserID=%s
             """, (user_id,))
             rows = cursor.fetchall()
             cursor.close()
-            keys = ["RestaurantID", "Name", "PriceRange", "AvgRating"]
+            keys = ["RestaurantID", "restaurant_name", "PriceRange", "AvgRating", "cuisine", "location"]
             return [dict(zip(keys, r)) for r in rows]
         except Exception as e:
             cursor.close()
