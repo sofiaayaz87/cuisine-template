@@ -12,11 +12,19 @@ from utils.map import haversine_distance
 
 
 class Restaurant:
-    def __init__(self, RestaurantID=None, Name=None, Description=None, Cuisine=None, Location=None,
-                 Rating=None, Latitude=None, Longitude=None):
+
+    def __init__(self,
+                 RestaurantID=None,
+                 Name=None,
+                 Description=None,
+                 Cuisine=None,
+                 Location=None,
+                 Rating=None,
+                 Latitude=None,
+                 Longitude=None):
         self.RestaurantID = RestaurantID
         self.Name = Name
-        self.Description= Description
+        self.Description = Description
         self.Cuisine = Cuisine
         self.Location = Location
         self.Rating = Rating
@@ -54,15 +62,24 @@ class Restaurant:
                     r.Name,
                     GROUP_CONCAT(DISTINCT c.CuisineType SEPARATOR ', ') AS Cuisine,
                     a.Area AS Location,
-                    ROUND(AVG(rt.RatingScore), 1) AS Rating,
-                    Count(rt.RatingScore) As RatedBy,
+                    rt_summary.AvgRating,
+                    rt_summary.RatedBy,
                     a.Latitude,
                     a.Longitude
                 FROM restaurant r
                 LEFT JOIN address a ON r.AddressID = a.AddressID
                 LEFT JOIN restaurantcuisine rc ON r.RestaurantID = rc.RestaurantID
                 LEFT JOIN cuisine c ON rc.CuisineID = c.CuisineID
-                LEFT JOIN rating rt ON r.RestaurantID = rt.RestaurantID
+
+                LEFT JOIN (
+                    SELECT 
+                        RestaurantID,
+                        ROUND(AVG(RatingScore), 1) AS AvgRating,
+                        COUNT(*) AS RatedBy
+                    FROM rating
+                    GROUP BY RestaurantID
+                ) rt_summary ON r.RestaurantID = rt_summary.RestaurantID
+
                 GROUP BY r.RestaurantID, r.Name, a.Area, a.Latitude, a.Longitude
             """
             cursor.execute(sql)
@@ -73,14 +90,22 @@ class Restaurant:
             for r in rows:
                 rid, name, cuisine, loc, rating, RatedBy, lat, lon = r
                 restaurants.append({
-                    "RestaurantID": rid,
-                    "Name": name,
-                    "Cuisine": cuisine or "N/A",
-                    "Location": loc or "N/A",
-                    "Rating": float(rating) if rating is not None else None,
-                    "RatedBy": RatedBy if RatedBy is not None else None,
-                    "Latitude": float(lat) if lat else None,
-                    "Longitude": float(lon) if lon else None
+                    "RestaurantID":
+                    rid,
+                    "Name":
+                    name,
+                    "Cuisine":
+                    cuisine or "N/A",
+                    "Location":
+                    loc or "N/A",
+                    "Rating":
+                    float(rating) if rating is not None else None,
+                    "RatedBy":
+                    RatedBy if RatedBy is not None else 0,
+                    "Latitude":
+                    float(lat) if lat else None,
+                    "Longitude":
+                    float(lon) if lon else None
                 })
             return restaurants
 
@@ -105,17 +130,28 @@ class Restaurant:
                     a.City,
                     a.Latitude,
                     a.Longitude,
-                    ROUND(AVG(rt.RatingScore), 1) AS Rating,
-                    COUNT(rt.RatingScore) AS RatedBy
+
+                    rt_summary.AvgRating,
+                    rt_summary.RatedBy
+
                 FROM restaurant r
                 LEFT JOIN address a ON r.AddressID = a.AddressID
                 LEFT JOIN restaurantcuisine rc ON r.RestaurantID = rc.RestaurantID
                 LEFT JOIN cuisine c ON rc.CuisineID = c.CuisineID
-                LEFT JOIN rating rt ON r.RestaurantID = rt.RestaurantID
+
+                LEFT JOIN (
+                    SELECT 
+                        RestaurantID,
+                        ROUND(AVG(RatingScore), 1) AS AvgRating,
+                        COUNT(*) AS RatedBy
+                    FROM rating
+                    GROUP BY RestaurantID
+                ) rt_summary ON r.RestaurantID = rt_summary.RestaurantID
+
                 WHERE r.RestaurantID = %s
                 GROUP BY r.RestaurantID, r.Name, a.Area, a.StreetAddress, a.City, a.Latitude, a.Longitude
             """
-            cursor.execute(sql, (restaurant_id,))
+            cursor.execute(sql, (restaurant_id, ))
             row = cursor.fetchone()
             cursor.close()
 
@@ -153,14 +189,26 @@ class Restaurant:
                     a.Area AS Location,
                     a.Latitude,
                     a.Longitude,
+
                     GROUP_CONCAT(DISTINCT c.CuisineType SEPARATOR ', ') AS Cuisine,
-                    ROUND(AVG(rt.RatingScore), 1) AS Rating,
-                    Count(rt.RatingScore) As RatedBy
+
+                    rt_summary.AvgRating,
+                    rt_summary.RatedBy
+
                 FROM restaurant r
                 LEFT JOIN address a ON r.AddressID = a.AddressID
                 LEFT JOIN restaurantcuisine rc ON r.RestaurantID = rc.RestaurantID
                 LEFT JOIN cuisine c ON rc.CuisineID = c.CuisineID
-                LEFT JOIN rating rt ON r.RestaurantID = rt.RestaurantID
+
+                LEFT JOIN (
+                    SELECT 
+                        RestaurantID,
+                        ROUND(AVG(RatingScore), 1) AS AvgRating,
+                        COUNT(*) AS RatedBy
+                    FROM rating
+                    GROUP BY RestaurantID
+                ) rt_summary ON r.RestaurantID = rt_summary.RestaurantID
+
                 GROUP BY r.RestaurantID, r.Name, a.Area, a.Latitude, a.Longitude
             """
             cursor.execute(sql)
@@ -170,19 +218,31 @@ class Restaurant:
             restaurants = []
             for r in rows:
                 rid, name, loc, lat, lon, cuisine, rating, RatedBy = r
+
                 dist = None
                 if lat and lon:
-                    dist = haversine_distance(float(user_lat), float(user_lon), float(lat), float(lon))
+                    dist = haversine_distance(float(user_lat), float(user_lon),
+                                              float(lat), float(lon))
+
                 restaurants.append({
-                    "RestaurantID": rid,
-                    "Name": name,
-                    "Cuisine": cuisine or "N/A",
-                    "Location": loc or "N/A",
-                    "Rating": float(rating) if rating is not None else None,
-                    "RatedBy": RatedBy if RatedBy is not None else None,
-                    "Latitude": float(lat) if lat else None,
-                    "Longitude": float(lon) if lon else None,
-                    "Distance_km": round(dist, 2) if dist else None
+                    "RestaurantID":
+                    rid,
+                    "Name":
+                    name,
+                    "Cuisine":
+                    cuisine or "N/A",
+                    "Location":
+                    loc or "N/A",
+                    "Rating":
+                    float(rating) if rating is not None else None,
+                    "RatedBy":
+                    RatedBy if RatedBy is not None else 0,
+                    "Latitude":
+                    float(lat) if lat else None,
+                    "Longitude":
+                    float(lon) if lon else None,
+                    "Distance_km":
+                    round(dist, 2) if dist else None
                 })
             return restaurants
 
@@ -194,13 +254,14 @@ class Restaurant:
 # ----------------------------------------------------
 # TEST (only runs if executed directly)
 # ----------------------------------------------------
-if __name__ == "__main__":  
+if __name__ == "__main__":
     print("Fetching all restaurants...")
     all_restaurants = Restaurant.get_all_restaurants()
     print(all_restaurants)
 
     user_lat, user_lon = 24.8607, 67.0011
-    restaurants_with_distance = Restaurant.get_all_with_distance(user_lat, user_lon)
+    restaurants_with_distance = Restaurant.get_all_with_distance(
+        user_lat, user_lon)
     print("Restaurants with distance from user:")
     for r in restaurants_with_distance:
         print(r)
