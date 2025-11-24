@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Menu - Cuisine</title>
+    <title>Discover Restaurants - Find Your Perfect Dining Experience</title>
     <link rel="stylesheet" href="/css/shared-styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -136,6 +136,38 @@
             align-items: center;
             gap: 0.5rem;
         }
+
+        .favorite-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: all var(--transition-fast);
+            z-index: 10;
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .favorite-btn.active {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .menu-item-card {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -143,8 +175,8 @@
 
     <div class="page-hero">
         <div class="container">
-            <h1>Our Menu</h1>
-            <p>We consider all the drivers of change give you the components you need to change to create a truly happens.</p>
+            <h1>Discover Restaurants</h1>
+            <p>Find the perfect restaurant for any occasion. Search by name, cuisine, or location to discover your next favorite dining spot.</p>
             <div class="search-bar">
                 <input type="text" id="searchInput" class="search-input" placeholder="Search restaurants, cuisine, location..." onkeypress="if(event.key==='Enter') searchRestaurants()">
                 <button class="btn btn-primary" onclick="searchRestaurants()">Search</button>
@@ -157,10 +189,12 @@
         <div class="container">
             <div class="filter-tabs">
                 <button class="filter-tab active" onclick="filterRestaurants('all')">All</button>
-                <button class="filter-tab" onclick="filterRestaurants('Breakfast')">Breakfast</button>
-                <button class="filter-tab" onclick="filterRestaurants('Main Dishes')">Main Dishes</button>
-                <button class="filter-tab" onclick="filterRestaurants('Drinks')">Drinks</button>
-                <button class="filter-tab" onclick="filterRestaurants('Desserts')">Desserts</button>
+                <button class="filter-tab" onclick="filterRestaurants('Italian')">Italian</button>
+                <button class="filter-tab" onclick="filterRestaurants('Chinese')">Chinese</button>
+                <button class="filter-tab" onclick="filterRestaurants('Indian')">Indian</button>
+                <button class="filter-tab" onclick="filterRestaurants('Middle Eastern')">Middle Eastern</button>
+                <button class="filter-tab" onclick="filterRestaurants('BBQ')">BBQ</button>
+                <button class="filter-tab" onclick="filterRestaurants('Korean')">Korean</button>
             </div>
 
             <div id="loadingContainer" class="loading" style="display: none;">Loading restaurants...</div>
@@ -176,13 +210,76 @@
         let allRestaurants = [];
         let currentFilter = 'all';
         let currentLocation = null;
+        let userFavorites = new Set();
 
         window.appHeader = new AppHeader();
         window.appHeader.mount();
         
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadUserFavorites();
             loadRestaurants();
         });
+
+        function getCuisineImage(cuisine) {
+            if (!cuisine) return '/images/cuisine/restaurant_food_dini_af3284cb.jpg';
+            
+            const cuisineLower = cuisine.toLowerCase();
+            const cuisineMap = {
+                'italian': '/images/cuisine/italian_pasta_dish_w_d3d5d42b.jpg',
+                'chinese': '/images/cuisine/chinese_food_dim_sum_8454327e.jpg',
+                'indian': '/images/cuisine/indian_curry_spices__32155dec.jpg',
+                'middle eastern': '/images/cuisine/middle_eastern_hummu_226ace75.jpg',
+                'bbq': '/images/cuisine/bbq_grilled_meat_bar_62e30329.jpg',
+                'korean': '/images/cuisine/korean_bibimbap_food_44f99399.jpg',
+                'japanese': '/images/cuisine/japanese_sushi_platt_08a94623.jpg',
+                'mexican': '/images/cuisine/mexican_tacos_food_c_bfd6d335.jpg'
+            };
+
+            for (const [key, value] of Object.entries(cuisineMap)) {
+                if (cuisineLower.includes(key)) {
+                    return value;
+                }
+            }
+            
+            return '/images/cuisine/restaurant_food_dini_af3284cb.jpg';
+        }
+
+        async function loadUserFavorites() {
+            const userId = api.getCurrentUserId();
+            if (userId) {
+                try {
+                    const favorites = await api.getUserFavorites(userId);
+                    userFavorites = new Set(favorites.map(f => f.RestaurantID));
+                } catch (error) {
+                    console.error('Error loading favorites:', error);
+                }
+            }
+        }
+
+        async function toggleFavorite(restaurantId, event) {
+            event.stopPropagation();
+            
+            const userId = api.getCurrentUserId();
+            if (!userId) {
+                alert('Please login to save favorites');
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                if (userFavorites.has(restaurantId)) {
+                    await api.removeFavorite(userId, restaurantId);
+                    userFavorites.delete(restaurantId);
+                } else {
+                    await api.addFavorite(userId, restaurantId);
+                    userFavorites.add(restaurantId);
+                }
+                renderRestaurants();
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+                alert('Failed to update favorites');
+            }
+        }
 
         async function loadRestaurants(lat = null, lon = null) {
             const loadingEl = document.getElementById('loadingContainer');
@@ -229,10 +326,15 @@
                 const rating = restaurant.Rating || 0;
                 const reviewCount = restaurant.RatedBy || 0;
                 const starDisplay = StarRating.display(rating, 18);
+                const cuisineImage = getCuisineImage(restaurant.Cuisine);
+                const isFavorite = userFavorites.has(restaurant.RestaurantID);
                 
                 return `
                     <div class="menu-item-card" onclick="viewRestaurant(${restaurant.RestaurantID})">
-                        <div class="menu-item-image"></div>
+                        <button class="favorite-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite(${restaurant.RestaurantID}, event)" title="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">
+                            ${isFavorite ? '❤️' : '🤍'}
+                        </button>
+                        <img src="${cuisineImage}" alt="${escapeHtml(restaurant.Cuisine || 'Restaurant')}" class="menu-item-image" />
                         <div class="menu-item-content">
                             <div class="menu-item-price">⭐ ${rating > 0 ? rating.toFixed(1) : 'New'}</div>
                             <h3 class="menu-item-title">${escapeHtml(restaurant.Name || 'Unknown Restaurant')}</h3>

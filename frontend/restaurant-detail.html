@@ -238,6 +238,65 @@
             margin: var(--spacing-sm) 0;
         }
 
+        .favorite-btn-hero {
+            background: white;
+            border: 2px solid white;
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: var(--spacing-md);
+        }
+
+        .favorite-btn-hero:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .favorite-btn-hero.active {
+            background: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
+        }
+
+        .booking-section {
+            background: var(--color-cream);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .booking-form {
+            display: grid;
+            gap: var(--spacing-md);
+            max-width: 600px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+        }
+
+        .booking-input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-family: var(--font-body);
+        }
+
+        .booking-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
         @media (max-width: 768px) {
             .restaurant-hero h1 {
                 font-size: 2.5rem;
@@ -248,6 +307,10 @@
             }
 
             .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
                 grid-template-columns: 1fr;
             }
         }
@@ -272,10 +335,50 @@
                         📍 <span id="restaurant-location"></span>
                     </div>
                 </div>
+                <button id="favorite-btn-hero" class="favorite-btn-hero" onclick="toggleFavoriteDetail()" style="display: none;">
+                    <span id="favorite-icon">🤍</span>
+                    <span id="favorite-text">Add to Favorites</span>
+                </button>
             </div>
         </div>
 
         <div class="container">
+            <section class="content-section booking-section" id="booking-section">
+                <h2>Book a Table</h2>
+                <form id="booking-form" class="booking-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="booking-date">Date</label>
+                            <input type="date" id="booking-date" class="booking-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="booking-time">Time</label>
+                            <input type="time" id="booking-time" class="booking-input" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="guest-count">Number of Guests</label>
+                        <select id="guest-count" class="booking-input" required>
+                            <option value="">Select number of guests</option>
+                            <option value="1">1 Guest</option>
+                            <option value="2">2 Guests</option>
+                            <option value="3">3 Guests</option>
+                            <option value="4">4 Guests</option>
+                            <option value="5">5 Guests</option>
+                            <option value="6">6 Guests</option>
+                            <option value="7">7 Guests</option>
+                            <option value="8">8 Guests</option>
+                            <option value="9">9+ Guests</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-notes">Special Requests (Optional)</label>
+                        <textarea id="booking-notes" class="booking-input" rows="3" placeholder="Any dietary restrictions or special occasions?"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-large">Reserve Table</button>
+                </form>
+            </section>
+
             <section class="content-section">
                 <h2>Menu</h2>
                 <div id="menu-container" class="menu-grid"></div>
@@ -317,6 +420,7 @@
 
         let currentRestaurantId = null;
         let ratingComponent = null;
+        let isFavorite = false;
 
         async function loadRestaurantDetails() {
             const params = new URLSearchParams(window.location.search);
@@ -347,16 +451,120 @@
 
                 await loadMenu(restaurantId);
                 await loadReviews(restaurantId);
+                await loadFavoriteStatus();
 
                 if (api.isAuthenticated()) {
                     document.getElementById('review-form-container').style.display = 'block';
+                    document.getElementById('favorite-btn-hero').style.display = 'inline-flex';
                     initializeReviewForm();
+                    initializeBookingForm();
                 }
 
             } catch (error) {
                 console.error('Error loading restaurant details:', error);
                 alert('Failed to load restaurant details');
             }
+        }
+
+        async function loadFavoriteStatus() {
+            const userId = api.getCurrentUserId();
+            if (userId) {
+                try {
+                    const favorites = await api.getUserFavorites(userId);
+                    isFavorite = favorites.some(f => f.RestaurantID === currentRestaurantId);
+                    updateFavoriteButton();
+                } catch (error) {
+                    console.error('Error loading favorite status:', error);
+                }
+            }
+        }
+
+        function updateFavoriteButton() {
+            const btn = document.getElementById('favorite-btn-hero');
+            const icon = document.getElementById('favorite-icon');
+            const text = document.getElementById('favorite-text');
+            
+            if (isFavorite) {
+                btn.classList.add('active');
+                icon.textContent = '❤️';
+                text.textContent = 'Remove from Favorites';
+            } else {
+                btn.classList.remove('active');
+                icon.textContent = '🤍';
+                text.textContent = 'Add to Favorites';
+            }
+        }
+
+        async function toggleFavoriteDetail() {
+            const userId = api.getCurrentUserId();
+            if (!userId) {
+                alert('Please login to save favorites');
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                if (isFavorite) {
+                    await api.removeFavorite(userId, currentRestaurantId);
+                    isFavorite = false;
+                } else {
+                    await api.addFavorite(userId, currentRestaurantId);
+                    isFavorite = true;
+                }
+                updateFavoriteButton();
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+                alert('Failed to update favorites');
+            }
+        }
+
+        function initializeBookingForm() {
+            const bookingForm = document.getElementById('booking-form');
+            const dateInput = document.getElementById('booking-date');
+            
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.setAttribute('min', today);
+            
+            bookingForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const userId = api.getCurrentUserId();
+                if (!userId) {
+                    alert('Please login to make a reservation');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const date = document.getElementById('booking-date').value;
+                const time = document.getElementById('booking-time').value;
+                const guestCount = document.getElementById('guest-count').value;
+                const notes = document.getElementById('booking-notes').value;
+
+                if (!date || !time || !guestCount) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                const reservationTime = `${date} ${time}:00`;
+
+                try {
+                    const result = await api.createReservation({
+                        RestaurantID: currentRestaurantId,
+                        UserID: userId,
+                        GuestCount: parseInt(guestCount),
+                        ReservationTime: reservationTime,
+                        Notes: notes || null
+                    });
+
+                    alert('Reservation created successfully!');
+                    bookingForm.reset();
+                    dateInput.setAttribute('min', today);
+                    window.location.href = '/my-reservations';
+                } catch (error) {
+                    console.error('Error creating reservation:', error);
+                    alert('Failed to create reservation. Please try again.');
+                }
+            });
         }
 
         async function loadMenu(restaurantId) {
