@@ -210,16 +210,16 @@
             gridEl.innerHTML = promotions.map(promo => `
                 <div class="promo-card">
                     <div class="promo-header">
-                        <div class="promo-discount">${promo.discount_percentage}% OFF</div>
+                        <div class="promo-discount">${promo.Discount}% OFF</div>
                     </div>
                     <div class="promo-body">
-                        <h3 class="promo-title">${promo.title || 'Special Offer'}</h3>
-                        <p class="promo-description">${promo.description || ''}</p>
-                        <div class="promo-restaurant">📍 ${promo.restaurant_name || 'Various Restaurants'}</div>
+                        <h3 class="promo-title">${promo.Title || 'Special Offer'}</h3>
+                        <p class="promo-description">${promo.Description || ''}</p>
+                        <div class="promo-restaurant">📍 ${promo.RestaurantName || 'Various Restaurants'}</div>
                         <div class="promo-validity">
-                            Valid: ${formatDate(promo.start_date)} - ${formatDate(promo.end_date)}
+                            Valid: ${formatDate(promo.ValidFrom)} - ${formatDate(promo.ValidTo)}
                         </div>
-                        ${promo.promo_code ? `<div class="promo-code">Code: ${promo.promo_code}</div>` : ''}
+                        ${promo.PromoCode ? `<div class="promo-code">Code: ${promo.PromoCode}</div>` : ''}
                     </div>
                 </div>
             `).join('');
