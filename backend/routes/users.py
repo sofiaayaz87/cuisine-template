@@ -30,9 +30,11 @@ def login_user():
                             "password required for existing user"}), 400
         ok, user = UserAccount.verify_login(email, password)
         if ok:
+            zipdata = UserAccount.row_to_dict(user)
+            print("User data:", zipdata)
             return jsonify({
                 "message": "login successful",
-                "user": UserAccount.row_to_dict(user)
+                "user": zipdata
             }), 200
         else:
             return jsonify({"error": "invalid credentials"}), 401
@@ -94,18 +96,22 @@ def verify_otp():
     email = (data.get("email") or "").strip().lower()
     otp_input = data.get("otp")
     print(f"[OTP VERIFY] Request data: {data}")
-    
+
     if not email or not otp_input:
         print(f"[OTP VERIFY] Missing email or OTP")
         return jsonify({"error": "email and otp required"}), 400
 
     record = otp_storage.get(email)
     if not record:
-        print(f"[OTP VERIFY] No OTP found for {email}. Current storage: {list(otp_storage.keys())}")
+        print(
+            f"[OTP VERIFY] No OTP found for {email}. Current storage: {list(otp_storage.keys())}"
+        )
         return jsonify({"error": "no OTP requested for this email"}), 400
 
-    print(f"[OTP VERIFY] Found record for {email}: OTP={record['otp']}, Expires={record['expires']}")
-    
+    print(
+        f"[OTP VERIFY] Found record for {email}: OTP={record['otp']}, Expires={record['expires']}"
+    )
+
     if datetime.utcnow() > record["expires"]:
         print(f"[OTP VERIFY] OTP expired for {email}")
         otp_storage.pop(email, None)
@@ -118,8 +124,9 @@ def verify_otp():
         print(f"[OTP VERIFY] Invalid OTP format: {otp_input}")
         return jsonify({"error": "invalid otp format"}), 400
 
-    print(f"[OTP VERIFY] Comparing OTP: input={otp_int}, stored={record['otp']}")
-    
+    print(
+        f"[OTP VERIFY] Comparing OTP: input={otp_int}, stored={record['otp']}")
+
     if otp_int != record["otp"]:
         print(f"[OTP VERIFY] OTP mismatch for {email}")
         return jsonify({"error": "invalid otp"}), 400

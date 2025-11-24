@@ -42,7 +42,6 @@ class UserAccount:
     @staticmethod
     def verify_login(email, password):
         hashed = UserAccount.hash_password(password)
-        print("Hashed password:", hashed)
         cursor = db.cursor(buffered=True)
         sql = "SELECT * FROM useraccount WHERE Email=%s AND PasswordHash=%s"
         cursor.execute(sql, (email, hashed))
@@ -76,10 +75,11 @@ class UserAccount:
     def row_to_dict(row):
         if not row:
             return None
+        print("Row data:", row)
         keys = [
             "Id", "FirstName", "LastName", "Email", "ContactNo",
-            "PasswordHash", "Role", "IsEmailVerified", "CreatedAt",
-            "UpdatedAt", "ProfileImageURL", "Status"
+            "PasswordHash", "IsEmailVerified", "Role", "Status",
+            "ProfileImageURL", "CreatedAt", "UpdatedAt"
         ]
         return dict(zip(keys, row))
 

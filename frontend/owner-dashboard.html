@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Owner Dashboard - MealMap</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/shared-styles.css">
     <style>
         .dashboard-container {
             max-width: 1400px;
@@ -479,7 +479,7 @@
     <script src="/js/api-client.js"></script>
     <script src="/js/header.js"></script>
     <script>
-        mountHeader('#header-mount');
+        initializeHeader('#header-mount');
         
         let currentRestaurant = null;
         let currentFilter = '';
